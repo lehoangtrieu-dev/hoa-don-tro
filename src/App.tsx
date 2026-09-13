@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Navbar } from "./components/Navbar";
 import { RoomSelector } from "./components/RoomSelector";
 import { UtilityTabs } from "./components/UtilityTabs";
+import { MeterInput } from "./components/MeterInput";
 
 export const App = () => {
   const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
@@ -12,6 +13,7 @@ export const App = () => {
       <Navbar />
       <RoomSelector />
       <UtilityTabs onSelect={setUtility} />
+      <MeterInput unit={utility === "dien" ? "kWh" : "m³"} />
     </div>
   );
 };
