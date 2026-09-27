@@ -16,7 +16,7 @@ export const RoomSelector = () => {
               <Select.Value />
             </Select.Trigger>
             <Select.Popover>
-              <ListBox className="max-h-50 overflow-scroll">
+              <ListBox className="max-h-96 overflow-y-auto">
                 <ListBox.Item id="1" textValue="1">
                   P.101
                 </ListBox.Item>
