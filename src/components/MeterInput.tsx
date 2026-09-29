@@ -6,7 +6,7 @@ interface Props {
 
 export const MeterInput = ({ unit }: Props) => {
   return (
-    <div>
+    <div className="mt-8">
       <Input
         className="field-sizing-content font-black text-4xl"
         type="number"
