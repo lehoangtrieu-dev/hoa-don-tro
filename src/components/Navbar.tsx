@@ -1,13 +1,25 @@
 import { Button, ListBox, Select } from "@heroui/react";
 import { Gear } from "@gravity-ui/icons";
 
-export const Navbar = () => {
+interface Props {
+  houses: string[];
+  house: string;
+  setHouse: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const Navbar = ({ houses, house, setHouse }: Props) => {
   return (
     <div className="w-full flex justify-between items-center">
       <Button variant="outline" isIconOnly>
         <Gear />
       </Button>
-      <Select aria-label="Chọn Nhà Trọ" defaultValue="1">
+      <Select
+        aria-label="Chọn Nhà Trọ"
+        value={house}
+        onChange={(e) => {
+          if (e) setHouse(String(e));
+        }}
+      >
         <Select.Trigger className="shadow-none">
           <strong className="text-base md:text-sm me-2">Nhà trọ:</strong>
           <Select.Value />
@@ -15,18 +27,12 @@ export const Navbar = () => {
         </Select.Trigger>
         <Select.Popover>
           <ListBox>
-            <ListBox.Item id="1" textValue="1">
-              1
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
-            <ListBox.Item id="2" textValue="2">
-              2
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
-            <ListBox.Item id="3" textValue="3">
-              3
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
+            {houses.map((value) => (
+              <ListBox.Item id={value} key={value} textValue={value}>
+                {value}
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            ))}
           </ListBox>
         </Select.Popover>
       </Select>
