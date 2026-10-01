@@ -16,8 +16,8 @@ export const Navbar = ({ houses, house, setHouse }: Props) => {
       <Select
         aria-label="Chọn Nhà Trọ"
         value={house}
-        onChange={(e) => {
-          if (e) setHouse(String(e));
+        onChange={(key) => {
+          if (key) setHouse(String(key));
         }}
       >
         <Select.Trigger className="shadow-none">

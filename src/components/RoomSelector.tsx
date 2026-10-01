@@ -1,6 +1,12 @@
 import { Pagination, Select, ListBox } from "@heroui/react";
 
-export const RoomSelector = () => {
+interface Props {
+  rooms: string[];
+  room: string;
+  setRoom: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export const RoomSelector = ({ rooms, room, setRoom }: Props) => {
   return (
     <Pagination className="w-fit">
       <Pagination.Content>
@@ -11,30 +17,23 @@ export const RoomSelector = () => {
           </Pagination.Previous>
         </Pagination.Item>
         <Pagination.Item>
-          <Select aria-label="Chọn Phòng" defaultValue="1">
+          <Select
+            aria-label="Chọn Phòng"
+            value={room}
+            onChange={(key) => {
+              if (key) setRoom(String(key));
+            }}
+          >
             <Select.Trigger>
               <Select.Value />
             </Select.Trigger>
             <Select.Popover>
               <ListBox className="max-h-96 overflow-y-auto">
-                <ListBox.Item id="1" textValue="1">
-                  P.101
-                </ListBox.Item>
-                <ListBox.Item id="2" textValue="2">
-                  P.102
-                </ListBox.Item>
-                <ListBox.Item id="3" textValue="3">
-                  P.103
-                </ListBox.Item>
-                <ListBox.Item id="4" textValue="4">
-                  P.201
-                </ListBox.Item>
-                <ListBox.Item id="5" textValue="5">
-                  P.202
-                </ListBox.Item>
-                <ListBox.Item id="6" textValue="6">
-                  P.203
-                </ListBox.Item>
+                {rooms.map((value) => (
+                  <ListBox.Item id={value} key={value} textValue={value}>
+                    {value}
+                  </ListBox.Item>
+                ))}
               </ListBox>
             </Select.Popover>
           </Select>

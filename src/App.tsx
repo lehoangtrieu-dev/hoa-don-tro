@@ -36,12 +36,15 @@ const rentalData: RentalData = {
   "2": {},
 };
 
-const houses = Object.keys(rentalData);
-
 export const App = () => {
   const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
+
+  const houses = Object.keys(rentalData);
   const [house, setHouse] = useState(houses[0]);
+
+  const rooms = Object.keys(rentalData[house]);
+  const [room, setRoom] = useState(rooms[0]);
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
@@ -50,7 +53,7 @@ export const App = () => {
         <UtilityTabs onSelect={setUtility} />
         <MonthPicker month={month} setMonth={setMonth} />
       </div>
-      <RoomSelector />
+      <RoomSelector rooms={rooms} room={room} setRoom={setRoom} />
       <MeterInput unit={utility === "dien" ? "kWh" : "m³"} />
       <MeterPhoto />
     </div>
