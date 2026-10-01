@@ -1,33 +1,32 @@
-import { useState } from "react";
-
 import { Button } from "@heroui/react";
 import { TrashBin, Camera } from "@gravity-ui/icons";
 
-export const MeterPhoto = () => {
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [imagePreview, setImagePreview] = useState("");
+interface Props {
+  image?: string;
+  setImage: (val?: string) => void;
+}
 
+export const MeterPhoto = ({ image, setImage }: Props) => {
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
 
     if (file) {
-      setIsUploaded(true);
       const localUrl = URL.createObjectURL(file);
-      setImagePreview(localUrl);
+      setImage(localUrl);
     }
   };
 
   return (
     <div className="relative">
-      {isUploaded ? (
+      {image ? (
         <>
-          <img className="rounded-3xl" src={imagePreview} alt="Ảnh công tơ" />
+          <img className="rounded-3xl" src={image} alt="Ảnh công tơ" />
           <Button
             className="absolute top-0 right-0 m-2"
             variant="danger"
-            onPress={() => setIsUploaded(false)}
+            onPress={() => setImage("")}
             isIconOnly
           >
             <TrashBin />

@@ -7,7 +7,7 @@ import { RoomSelector } from "./components/RoomSelector";
 import { MeterInput } from "./components/MeterInput";
 import { MeterPhoto } from "./components/MeterPhoto";
 
-import { type RentalData } from "./type";
+import { type RentalData, type UtilityRecord } from "./type";
 
 const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -48,12 +48,14 @@ export const App = () => {
   const rooms = Object.keys(data[house]);
   const [room, setRoom] = useState(rooms[0]);
 
+  const utilityRecord = data[house]?.[room]?.[month]?.[utility];
+
   useEffect(() => {
     const rooms = Object.keys(data[house]);
     setRoom(rooms[0]);
   }, [house]);
 
-  const handleMeterValueChange = (val?: number) => {
+  const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
     setData((prev) => {
       const next = structuredClone(prev);
 
@@ -61,8 +63,8 @@ export const App = () => {
       next[house][room] ??= {};
       next[house][room][month] ??= { dien: {}, nuoc: {} };
       next[house][room][month][utility] ??= {};
-      next[house][room][month][utility].value = val;
 
+      Object.assign(next[house][room][month][utility], fields);
       return next;
     });
   };
@@ -76,11 +78,14 @@ export const App = () => {
       </div>
       <RoomSelector rooms={rooms} room={room} setRoom={setRoom} />
       <MeterInput
-        value={data[house]?.[room]?.[month]?.[utility]?.value}
-        setValue={handleMeterValueChange}
+        value={utilityRecord?.value}
+        setValue={(val) => updateUtilityRecord({ value: val })}
         unit={utility === "dien" ? "kWh" : "m³"}
       />
-      <MeterPhoto />
+      <MeterPhoto
+        image={utilityRecord?.image}
+        setImage={(img) => updateUtilityRecord({ image: img })}
+      />
     </div>
   );
 };
