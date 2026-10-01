@@ -13,7 +13,7 @@ const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
 const yyyy = today.getFullYear();
 
-const rentalData: RentalData = {
+const initialRentalData: RentalData = {
   "1": {
     "P.101": {
       "2026-09": {
@@ -37,19 +37,35 @@ const rentalData: RentalData = {
 };
 
 export const App = () => {
+  const [data, setData] = useState<RentalData>(initialRentalData);
+
   const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
 
-  const houses = Object.keys(rentalData);
+  const houses = Object.keys(data);
   const [house, setHouse] = useState(houses[0]);
 
-  const rooms = Object.keys(rentalData[house]);
+  const rooms = Object.keys(data[house]);
   const [room, setRoom] = useState(rooms[0]);
 
   useEffect(() => {
-    const rooms = Object.keys(rentalData[house]);
+    const rooms = Object.keys(data[house]);
     setRoom(rooms[0]);
   }, [house]);
+
+  const handleMeterValueChange = (val?: number) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+
+      next[house] ??= {};
+      next[house][room] ??= {};
+      next[house][room][month] ??= { dien: {}, nuoc: {} };
+      next[house][room][month][utility] ??= {};
+      next[house][room][month][utility].value = val;
+
+      return next;
+    });
+  };
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
@@ -59,7 +75,11 @@ export const App = () => {
         <MonthPicker month={month} setMonth={setMonth} />
       </div>
       <RoomSelector rooms={rooms} room={room} setRoom={setRoom} />
-      <MeterInput unit={utility === "dien" ? "kWh" : "m³"} />
+      <MeterInput
+        value={data[house]?.[room]?.[month]?.[utility]?.value}
+        setValue={handleMeterValueChange}
+        unit={utility === "dien" ? "kWh" : "m³"}
+      />
       <MeterPhoto />
     </div>
   );
