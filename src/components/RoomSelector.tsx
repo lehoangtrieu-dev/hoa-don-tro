@@ -11,7 +11,10 @@ export const RoomSelector = ({ rooms, room, setRoom }: Props) => {
     <Pagination className="w-fit">
       <Pagination.Content>
         <Pagination.Item>
-          <Pagination.Previous>
+          <Pagination.Previous
+            isDisabled={room === rooms[0]}
+            onPress={() => setRoom((room) => rooms[rooms.indexOf(room) - 1])}
+          >
             <Pagination.PreviousIcon />
             <span>Phòng trước</span>
           </Pagination.Previous>
@@ -39,7 +42,10 @@ export const RoomSelector = ({ rooms, room, setRoom }: Props) => {
           </Select>
         </Pagination.Item>
         <Pagination.Item>
-          <Pagination.Next>
+          <Pagination.Next
+            isDisabled={room === rooms.at(-1)}
+            onPress={() => setRoom((room) => rooms[rooms.indexOf(room) + 1])}
+          >
             <span>Phòng tiếp theo</span>
             <Pagination.NextIcon />
           </Pagination.Next>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Navbar } from "./components/Navbar";
 import { UtilityTabs } from "./components/UtilityTabs";
@@ -45,6 +45,11 @@ export const App = () => {
 
   const rooms = Object.keys(rentalData[house]);
   const [room, setRoom] = useState(rooms[0]);
+
+  useEffect(() => {
+    const rooms = Object.keys(rentalData[house]);
+    setRoom(rooms[0]);
+  }, [house]);
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
