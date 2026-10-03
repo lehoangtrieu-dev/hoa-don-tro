@@ -5,6 +5,7 @@ import {
   Accordion,
   Input,
   Chip,
+  CloseButton,
   Separator,
 } from "@heroui/react";
 import { type RentalData } from "../type";
@@ -13,6 +14,34 @@ interface Props {
   data: RentalData;
   houses: string[];
 }
+
+const handleRenameHouse = (oldName: string) => {
+  const newName = prompt("Nhập tên mới cho nhà trọ:", oldName);
+  if (newName && newName.trim() && newName !== oldName) {
+  }
+};
+
+const handleAddHouse = () => {
+  const name = prompt("Nhập tên nhà trọ mới (ví dụ: Trọ Bình Thạnh):");
+  if (name && name.trim()) {
+  }
+};
+
+const handleDeleteHouse = (houseName: string) => {
+  if (
+    confirm(`Bạn có chắc muốn xóa "${houseName}" và toàn bộ dữ liệu không?`)
+  ) {
+  }
+};
+
+const handleDeleteRoom = (room: string) => {
+  if (
+    confirm(
+      `Bạn có chắc muốn xóa phòng "${room}" không? Toàn bộ số liệu các tháng sẽ bị xóa.`,
+    )
+  ) {
+  }
+};
 
 export function SettingsModal({ data, houses }: Props) {
   return (
@@ -46,10 +75,19 @@ export function SettingsModal({ data, houses }: Props) {
                     </Accordion.Heading>
                     <Accordion.Panel>
                       <Accordion.Body>
-                        <Button variant="secondary" className="me-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="me-2"
+                          onPress={() => handleRenameHouse(house)}
+                        >
                           <Pencil /> Sửa tên
                         </Button>
-                        <Button variant="danger">
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onPress={() => handleDeleteHouse(house)}
+                        >
                           <TrashBin />
                           Xóa nhà
                         </Button>
@@ -57,27 +95,33 @@ export function SettingsModal({ data, houses }: Props) {
                         <h1 className="font-medium">Danh sách phòng</h1>
                         <div className="flex gap-2 mt-2 mb-4">
                           <Input
-                            aria-label="Name"
+                            aria-label="Tên phòng"
                             placeholder="P.101,P.102,P.201..."
                           />
                           <Button variant="tertiary" isIconOnly>
                             <Plus />
                           </Button>
                         </div>
-                        {Object.keys(data[house]).map((room) => (
-                          <Chip
-                            key={room}
-                            className="me-2 hover:text-danger-soft-foreground hover:bg-danger-soft hover:line-through cursor-pointer"
-                          >
-                            {room}
-                          </Chip>
-                        ))}
+                        <div className="flex flex-wrap gap-2">
+                          {Object.keys(data[house]).map((room) => (
+                            <Chip key={room}>
+                              {room}
+                              <CloseButton
+                                onPress={() => handleDeleteRoom(room)}
+                              ></CloseButton>
+                            </Chip>
+                          ))}
+                        </div>
                       </Accordion.Body>
                     </Accordion.Panel>
                   </Accordion.Item>
                 ))}
               </Accordion>
-              <Button variant="outline" className="w-full mt-2">
+              <Button
+                variant="outline"
+                className="w-full mt-2"
+                onClick={handleAddHouse}
+              >
                 <Plus /> Thêm nhà trọ mới
               </Button>
             </Modal.Body>
