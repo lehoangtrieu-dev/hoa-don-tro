@@ -71,7 +71,7 @@ export const App = () => {
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
-      <Navbar houses={houses} house={house} setHouse={setHouse} />
+      <Navbar houses={houses} data={data} house={house} setHouse={setHouse} />
       <div className="flex gap-2">
         <UtilityTabs onSelect={setUtility} />
         <MonthPicker month={month} setMonth={setMonth} />

@@ -1,18 +1,18 @@
-import { Button, ListBox, Select } from "@heroui/react";
-import { Gear } from "@gravity-ui/icons";
+import { ListBox, Select } from "@heroui/react";
+import { SettingsModal } from "./SettingsModal";
+import { type RentalData } from "../type";
 
 interface Props {
+  data: RentalData;
   houses: string[];
   house: string;
   setHouse: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const Navbar = ({ houses, house, setHouse }: Props) => {
+export const Navbar = ({ data, houses, house, setHouse }: Props) => {
   return (
     <div className="w-full flex justify-between items-center">
-      <Button variant="outline" isIconOnly>
-        <Gear />
-      </Button>
+      <SettingsModal data={data} houses={houses} />
       <Select
         aria-label="Chọn Nhà Trọ"
         value={house}
