@@ -4,17 +4,19 @@ import { type RentalData } from "../type";
 
 interface Props {
   data: RentalData;
+  setData: React.Dispatch<React.SetStateAction<RentalData>>;
   houses: string[];
   house: string;
   setHouse: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const Navbar = ({ data, houses, house, setHouse }: Props) => {
+export const Navbar = ({ data, setData, houses, house, setHouse }: Props) => {
   return (
     <div className="w-full flex justify-between items-center">
-      <SettingsModal data={data} houses={houses} />
+      <SettingsModal data={data} setData={setData} houses={houses} />
       <Select
         aria-label="Chọn Nhà Trọ"
+        placeholder="—"
         value={house}
         onChange={(key) => {
           if (key) setHouse(String(key));

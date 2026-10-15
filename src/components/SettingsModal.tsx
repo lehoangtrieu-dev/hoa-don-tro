@@ -12,38 +12,61 @@ import { type RentalData } from "../type";
 
 interface Props {
   data: RentalData;
+  setData: React.Dispatch<React.SetStateAction<RentalData>>;
   houses: string[];
 }
 
-const handleRenameHouse = (oldName: string) => {
-  const newName = prompt("Nhập tên mới cho nhà trọ:", oldName);
-  if (newName && newName.trim() && newName !== oldName) {
-  }
-};
+export function SettingsModal({ data, setData, houses }: Props) {
+  const handleRenameHouse = (oldName: string) => {
+    const newName = prompt("Nhập tên mới cho nhà trọ:", oldName);
+    if (newName && newName.trim() && newName !== oldName) {
+      setData((prev) => {
+        const next = structuredClone(prev);
+        next[newName.trim()] = next[oldName];
+        delete next[oldName];
+        return next;
+      });
+    }
+  };
 
-const handleAddHouse = () => {
-  const name = prompt("Nhập tên nhà trọ mới (ví dụ: Trọ Bình Thạnh):");
-  if (name && name.trim()) {
-  }
-};
+  const handleAddHouse = () => {
+    const name = prompt("Nhập tên nhà trọ mới (ví dụ: Trọ Bình Thạnh):");
+    if (name && name.trim()) {
+      setData((prev) => ({
+        ...prev,
+        [name.trim()]: {},
+      }));
+    }
+  };
 
-const handleDeleteHouse = (houseName: string) => {
-  if (
-    confirm(`Bạn có chắc muốn xóa "${houseName}" và toàn bộ dữ liệu không?`)
-  ) {
-  }
-};
+  const handleDeleteHouse = (houseName: string) => {
+    if (
+      confirm(`Bạn có chắc muốn xóa "${houseName}" và toàn bộ dữ liệu không?`)
+    ) {
+      setData((prev) => {
+        const next = structuredClone(prev);
+        delete next[houseName];
+        return next;
+      });
+    }
+  };
 
-const handleDeleteRoom = (room: string) => {
-  if (
-    confirm(
-      `Bạn có chắc muốn xóa phòng "${room}" không? Toàn bộ số liệu các tháng sẽ bị xóa.`,
-    )
-  ) {
-  }
-};
+  const handleDeleteRoom = (house: string, room: string) => {
+    if (
+      confirm(
+        `Bạn có chắc muốn xóa phòng "${room}" không? Toàn bộ số liệu các tháng sẽ bị xóa.`,
+      )
+    ) {
+      setData((prev) => {
+        const next = structuredClone(prev);
+        if (next[house]) {
+          delete next[house][room];
+        }
+        return next;
+      });
+    }
+  };
 
-export function SettingsModal({ data, houses }: Props) {
   return (
     <Modal>
       <Button variant="outline" isIconOnly>
@@ -107,7 +130,7 @@ export function SettingsModal({ data, houses }: Props) {
                             <Chip key={room}>
                               {room}
                               <CloseButton
-                                onPress={() => handleDeleteRoom(room)}
+                                onPress={() => handleDeleteRoom(house, room)}
                               ></CloseButton>
                             </Chip>
                           ))}

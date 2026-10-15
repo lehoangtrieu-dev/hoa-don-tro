@@ -22,6 +22,7 @@ export const RoomSelector = ({ rooms, room, setRoom }: Props) => {
         <Pagination.Item>
           <Select
             aria-label="Chọn Phòng"
+            placeholder="—"
             value={room}
             onChange={(key) => {
               if (key) setRoom(String(key));

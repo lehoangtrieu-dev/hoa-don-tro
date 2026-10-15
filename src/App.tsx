@@ -45,15 +45,21 @@ export const App = () => {
   const houses = Object.keys(data);
   const [house, setHouse] = useState(houses[0]);
 
-  const rooms = Object.keys(data[house]);
+  const rooms = data[house] ? Object.keys(data[house]) : [];
   const [room, setRoom] = useState(rooms[0]);
 
   const utilityRecord = data[house]?.[room]?.[month]?.[utility];
 
   useEffect(() => {
-    const rooms = Object.keys(data[house]);
+    if (!data[house] && houses.length > 0) {
+      setHouse(houses[0]);
+    }
+  }, [data, house, houses]);
+
+  useEffect(() => {
+    const rooms = data[house] ? Object.keys(data[house]) : [];
     setRoom(rooms[0]);
-  }, [house]);
+  }, [house, data]);
 
   const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
     setData((prev) => {
@@ -71,7 +77,13 @@ export const App = () => {
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
-      <Navbar houses={houses} data={data} house={house} setHouse={setHouse} />
+      <Navbar
+        data={data}
+        setData={setData}
+        houses={houses}
+        house={house}
+        setHouse={setHouse}
+      />
       <div className="flex gap-2">
         <UtilityTabs onSelect={setUtility} />
         <MonthPicker month={month} setMonth={setMonth} />
