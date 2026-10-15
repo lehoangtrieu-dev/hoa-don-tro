@@ -13,31 +13,11 @@ const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
 const yyyy = today.getFullYear();
 
-const initialRentalData: RentalData = {
-  "1": {
-    "P.101": {
-      "2026-09": {
-        dien: {
-          value: 1485,
-          image: undefined,
-        },
-        nuoc: {
-          value: 85,
-          image: undefined,
-        },
-      },
-      "2026-10": {
-        dien: {},
-        nuoc: {},
-      },
-    },
-    "P.102": {},
-  },
-  "2": {},
-};
-
 export const App = () => {
-  const [data, setData] = useState<RentalData>(initialRentalData);
+  const [data, setData] = useState<RentalData>(() => {
+    const savedData = localStorage.getItem("data");
+    return savedData ? JSON.parse(savedData) : {};
+  });
 
   const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
@@ -49,6 +29,10 @@ export const App = () => {
   const [room, setRoom] = useState(rooms[0]);
 
   const utilityRecord = data[house]?.[room]?.[month]?.[utility];
+
+  useEffect(() => {
+    localStorage.setItem("data", JSON.stringify(data));
+  }, [data]);
 
   useEffect(() => {
     if (!data[house] && houses.length > 0) {

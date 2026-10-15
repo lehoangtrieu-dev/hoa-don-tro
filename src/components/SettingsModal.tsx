@@ -51,6 +51,21 @@ export function SettingsModal({ data, setData, houses }: Props) {
     }
   };
 
+  const handleAddRoom = (house: string, value: string) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+      if (next[house]) {
+        value.split(",").forEach((room) => {
+          const trimmed = room.trim();
+          if (trimmed) {
+            next[house][trimmed] ??= {};
+          }
+        });
+      }
+      return next;
+    });
+  };
+
   const handleDeleteRoom = (house: string, room: string) => {
     if (
       confirm(
@@ -116,15 +131,29 @@ export function SettingsModal({ data, setData, houses }: Props) {
                         </Button>
                         <Separator className="my-4" />
                         <h1 className="font-medium">Danh sách phòng</h1>
-                        <div className="flex gap-2 mt-2 mb-4">
+                        <form
+                          className="flex gap-2 mt-2 mb-4"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const form = e.currentTarget;
+                            const input = form.elements.namedItem(
+                              "roomInput",
+                            ) as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              handleAddRoom(house, input.value);
+                              input.value = "";
+                            }
+                          }}
+                        >
                           <Input
+                            name="roomInput"
                             aria-label="Tên phòng"
                             placeholder="P.101,P.102,P.201..."
                           />
-                          <Button variant="tertiary" isIconOnly>
+                          <Button type="submit" variant="tertiary" isIconOnly>
                             <Plus />
                           </Button>
-                        </div>
+                        </form>
                         <div className="flex flex-wrap gap-2">
                           {Object.keys(data[house]).map((room) => (
                             <Chip key={room}>
