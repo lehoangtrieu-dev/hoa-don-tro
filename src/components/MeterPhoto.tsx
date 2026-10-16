@@ -13,8 +13,12 @@ export const MeterPhoto = ({ image, setImage }: Props) => {
     const file = e.target.files?.[0];
 
     if (file) {
-      const localUrl = URL.createObjectURL(file);
-      setImage(localUrl);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setImage(base64);
+      };
+      reader.readAsDataURL(file);
     }
   };
 

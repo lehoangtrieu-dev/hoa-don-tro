@@ -6,6 +6,8 @@ import { MonthPicker } from "./components/MonthPicker";
 import { RoomSelector } from "./components/RoomSelector";
 import { MeterInput } from "./components/MeterInput";
 import { MeterPhoto } from "./components/MeterPhoto";
+import { LoadingModal } from "./components/LoadingModal";
+import { scanMeterWithGemini } from "./services/gemini";
 
 import { type RentalData, type UtilityRecord } from "./type";
 
@@ -28,6 +30,9 @@ export const App = () => {
   const rooms = data[house] ? Object.keys(data[house]) : [];
   const [room, setRoom] = useState(rooms[0]);
 
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+
   const utilityRecord = data[house]?.[room]?.[month]?.[utility];
 
   useEffect(() => {
@@ -45,6 +50,35 @@ export const App = () => {
     setRoom(rooms[0]);
   }, [house, data]);
 
+  useEffect(() => {
+    if (!utilityRecord?.image || utilityRecord?.value) return;
+
+    const performScan = async () => {
+      setIsScanning(true);
+      setScanError(null);
+
+      try {
+        const scannedValue = await scanMeterWithGemini(utilityRecord.image);
+
+        if (scannedValue === null || isNaN(scannedValue)) {
+          throw new Error(
+            "Không nhận diện được số trên công tơ. Vui lòng chụp rõ hơn.",
+          );
+        }
+
+        updateUtilityRecord({ value: scannedValue });
+        setIsScanning(false);
+      } catch (err: any) {
+        const msg =
+          err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
+        setScanError(msg || "Đã xảy ra lỗi khi quét ảnh công tơ.");
+        setIsScanning(false);
+      }
+    };
+
+    performScan();
+  }, [utilityRecord?.image]);
+
   const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
     setData((prev) => {
       const next = structuredClone(prev);
@@ -61,6 +95,14 @@ export const App = () => {
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
+      <LoadingModal
+        isOpen={isScanning || !!scanError}
+        error={scanError}
+        onCancel={() => {
+          setIsScanning(false);
+          setScanError(null);
+        }}
+      />
       <Navbar
         data={data}
         setData={setData}
