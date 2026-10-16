@@ -1,6 +1,7 @@
 import { Gear } from "@gravity-ui/icons";
-import { Button, Modal } from "@heroui/react";
+import { Button, Modal, Tabs } from "@heroui/react";
 import { RentalManagement } from "./RentalManagement";
+import { AccountManagement } from "./AccountManagement";
 import { type RentalData } from "../../type";
 
 interface Props {
@@ -24,11 +25,34 @@ export function SettingsModal({ data, setData, houses }: Props) {
                 <Modal.Icon className="bg-default text-foreground">
                   <Gear className="size-5" />
                 </Modal.Icon>
-                <Modal.Heading>Cài đặt</Modal.Heading>
+                <Modal.Heading>Cài đặt hệ thống</Modal.Heading>
               </div>
             </Modal.Header>
             <Modal.Body>
-              <RentalManagement data={data} setData={setData} houses={houses} />
+              <Tabs>
+                <Tabs.ListContainer>
+                  <Tabs.List>
+                    <Tabs.Tab id="1">
+                      Nhà & Phòng
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                    <Tabs.Tab id="2">
+                      Tài Khoản
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                  </Tabs.List>
+                </Tabs.ListContainer>
+                <Tabs.Panel id="1">
+                  <RentalManagement
+                    data={data}
+                    setData={setData}
+                    houses={houses}
+                  />
+                </Tabs.Panel>
+                <Tabs.Panel id="2">
+                  <AccountManagement />
+                </Tabs.Panel>
+              </Tabs>
             </Modal.Body>
             <Modal.Footer>
               <Button className="w-full" slot="close">
