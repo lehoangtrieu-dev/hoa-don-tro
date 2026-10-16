@@ -15,6 +15,15 @@ interface Props {
 
 export const ModelSelector = ({ apiKey }: Props) => {
   const [models, setModels] = useState<GeminiModel[]>([]);
+  const [model, setModel] = useState(() => {
+    const savedModel = localStorage.getItem("model");
+    return savedModel ? savedModel : "";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("model", model);
+  }, [model]);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +83,12 @@ export const ModelSelector = ({ apiKey }: Props) => {
   if (models.length === 0) return null;
 
   return (
-    <Select>
+    <Select
+      value={model}
+      onChange={(key) => {
+        if (key) setModel(String(key));
+      }}
+    >
       <Label>Model:</Label>
       <Select.Trigger>
         <Select.Value />
@@ -84,7 +98,11 @@ export const ModelSelector = ({ apiKey }: Props) => {
       <Select.Popover>
         <ListBox>
           {models.map((model) => (
-            <ListBox.Item id={model.name} key={model.name}>
+            <ListBox.Item
+              id={model.name}
+              key={model.name}
+              textValue={model.name}
+            >
               {model.name.replace("models/", "")}
               <ListBox.ItemIndicator />
             </ListBox.Item>
