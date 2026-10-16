@@ -1,5 +1,5 @@
 import { ListBox, Select } from "@heroui/react";
-import { SettingsModal } from "./SettingsModal";
+import { SettingsModal } from "./settings/SettingsModal";
 import { type RentalData } from "../type";
 
 interface Props {
