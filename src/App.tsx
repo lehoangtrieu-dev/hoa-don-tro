@@ -24,34 +24,41 @@ export const App = () => {
   const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
 
+  const [selectedHouse, setSelectedHouse] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState("");
+
   const houses = Object.keys(data);
-  const [house, setHouse] = useState(houses[0]);
+  const house =
+    (houses.includes(selectedHouse) ? selectedHouse : houses[0]) || "";
 
   const rooms = data[house] ? Object.keys(data[house]) : [];
-  const [room, setRoom] = useState(rooms[0]);
+  const room = (rooms.includes(selectedRoom) ? selectedRoom : rooms[0]) || "";
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
   const utilityRecord = data[house]?.[room]?.[month]?.[utility];
 
+  const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+
+      next[house] ??= {};
+      next[house][room] ??= {};
+      next[house][room][month] ??= { dien: {}, nuoc: {} };
+      next[house][room][month][utility] ??= {};
+
+      Object.assign(next[house][room][month][utility], fields);
+      return next;
+    });
+  };
+
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
   }, [data]);
 
   useEffect(() => {
-    if (!data[house] && houses.length > 0) {
-      setHouse(houses[0]);
-    }
-  }, [data, house, houses]);
-
-  useEffect(() => {
-    const rooms = data[house] ? Object.keys(data[house]) : [];
-    setRoom(rooms[0]);
-  }, [house, data]);
-
-  useEffect(() => {
-    if (!utilityRecord?.image || utilityRecord?.value) return;
+    if (!utilityRecord?.image || utilityRecord?.value !== undefined) return;
 
     const performScan = async () => {
       setIsScanning(true);
@@ -68,30 +75,20 @@ export const App = () => {
 
         updateUtilityRecord({ value: scannedValue });
         setIsScanning(false);
-      } catch (err: any) {
-        const msg =
-          err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
-        setScanError(msg || "Đã xảy ra lỗi khi quét ảnh công tơ.");
+      } catch (err) {
+        if (err instanceof Error) {
+          const msg =
+            err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
+          setScanError(msg || "Đã xảy ra lỗi khi quét ảnh công tơ.");
+          setIsScanning(false);
+        }
+      } finally {
         setIsScanning(false);
       }
     };
 
     performScan();
   }, [utilityRecord?.image]);
-
-  const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
-    setData((prev) => {
-      const next = structuredClone(prev);
-
-      next[house] ??= {};
-      next[house][room] ??= {};
-      next[house][room][month] ??= { dien: {}, nuoc: {} };
-      next[house][room][month][utility] ??= {};
-
-      Object.assign(next[house][room][month][utility], fields);
-      return next;
-    });
-  };
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
@@ -108,13 +105,13 @@ export const App = () => {
         setData={setData}
         houses={houses}
         house={house}
-        setHouse={setHouse}
+        setHouse={setSelectedHouse}
       />
       <div className="flex gap-2">
         <UtilityTabs onSelect={setUtility} />
         <MonthPicker month={month} setMonth={setMonth} />
       </div>
-      <RoomSelector rooms={rooms} room={room} setRoom={setRoom} />
+      <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
       <MeterInput
         value={utilityRecord?.value}
         setValue={(val) => updateUtilityRecord({ value: val })}

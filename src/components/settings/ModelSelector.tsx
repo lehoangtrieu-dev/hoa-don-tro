@@ -50,10 +50,12 @@ export const ModelSelector = ({ apiKey }: Props) => {
         );
 
         setModels(geminiModels.length > 0 ? geminiModels : list);
-      } catch (err: any) {
-        const msg =
-          err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
-        setError(msg || "Đã xảy ra lỗi khi tải danh sách model.");
+      } catch (err) {
+        if (err instanceof Error) {
+          const msg =
+            err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
+          setError(msg || "Đã xảy ra lỗi khi tải danh sách model.");
+        }
       } finally {
         setLoading(false);
       }

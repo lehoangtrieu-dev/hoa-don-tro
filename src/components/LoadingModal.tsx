@@ -8,6 +8,8 @@ interface Props {
 }
 
 export const LoadingModal = ({ isOpen, error, onCancel }: Props) => {
+  if (!isOpen) return null;
+
   return (
     <Modal isOpen={isOpen}>
       <Modal.Backdrop isDismissable={false}>
