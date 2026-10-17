@@ -10,7 +10,7 @@ import { MeterOutput } from "./components/MeterOutput";
 import { LoadingModal } from "./components/LoadingModal";
 import { scanMeterWithGemini } from "./services/gemini";
 
-import { type RentalData, type UtilityRecord } from "./type";
+import { type RentalData, type UtilityRecord, type UtilityType } from "./type";
 
 const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -22,7 +22,7 @@ export const App = () => {
     return savedData ? JSON.parse(savedData) : {};
   });
 
-  const [utility, setUtility] = useState<"dien" | "nuoc">("dien");
+  const [utility, setUtility] = useState<UtilityType>("electricity");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
 
   const [selectedHouse, setSelectedHouse] = useState("");
@@ -46,7 +46,7 @@ export const App = () => {
 
       next[house] ??= {};
       next[house][room] ??= {};
-      next[house][room][month] ??= { dien: {}, nuoc: {} };
+      next[house][room][month] ??= {};
       next[house][room][month][utility] ??= {};
 
       Object.assign(next[house][room][month][utility], fields);
@@ -117,7 +117,7 @@ export const App = () => {
       <MeterInput
         value={utilityRecord?.value}
         setValue={(val) => updateUtilityRecord({ value: val })}
-        unit={utility === "dien" ? "kWh" : "m³"}
+        unit={utility === "electricity" ? "kWh" : "m³"}
       />
       <MeterPhoto
         image={utilityRecord?.image}

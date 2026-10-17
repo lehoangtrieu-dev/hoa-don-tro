@@ -9,7 +9,7 @@ const getPreviousMonth = (monthStr: string): string => {
   return `${yyyy}-${mm}`;
 };
 
-const getConsumption = (currentValue?: number, previousValue?: number) => {
+const calculateUsage = (currentValue?: number, previousValue?: number) => {
   return currentValue !== undefined && previousValue !== undefined
     ? currentValue - previousValue
     : 0;
@@ -31,24 +31,27 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
   const prevMonth = getPreviousMonth(month);
   const previousRecord = data[house]?.[room]?.[prevMonth];
 
-  const previousDien = previousRecord?.dien?.value;
-  const currentDien = currentRecord?.dien?.value;
+  const previousElectricity = previousRecord?.electricity?.value;
+  const currentElectricity = currentRecord?.electricity?.value;
 
-  const previousNuoc = previousRecord?.nuoc?.value;
-  const currentNuoc = currentRecord?.nuoc?.value;
+  const previousWater = previousRecord?.water?.value;
+  const currentWater = currentRecord?.water?.value;
 
-  const consumptionDien = getConsumption(currentDien, previousDien);
-  const consumptionNuoc = getConsumption(currentNuoc, previousNuoc);
+  const electricityUsage = calculateUsage(
+    currentElectricity,
+    previousElectricity,
+  );
+  const waterUsage = calculateUsage(currentWater, previousWater);
 
-  const pricePerKwh = 3500;
-  const pricePerM3 = 28000;
-
-  const dienPrice = consumptionDien * pricePerKwh;
-  const nuocPrice = consumptionNuoc * pricePerM3;
-  const servicePrice = 30000;
+  const electricityRate = 3500;
+  const waterRate = 28000;
+  const trashFee = 30000;
   const roomPrice = 2000000;
 
-  const totalPrice = nuocPrice + dienPrice + roomPrice + servicePrice;
+  const electricityCost = electricityUsage * electricityRate;
+  const waterCost = waterUsage * waterRate;
+
+  const totalCost = electricityCost + waterCost + roomPrice + trashFee;
 
   return (
     <Table className="mt-8">
@@ -65,25 +68,25 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
           </Table.Header>
           <Table.Body>
             <Table.Row>
-              <Table.Cell>Số Điện</Table.Cell>
-              <Table.Cell>{currentDien ?? "-"}</Table.Cell>
-              <Table.Cell>{previousDien ?? "-"}</Table.Cell>
-              <Table.Cell>{consumptionDien}</Table.Cell>
-              <Table.Cell>{formatVND(dienPrice)}</Table.Cell>
+              <Table.Cell>Số điện</Table.Cell>
+              <Table.Cell>{currentElectricity ?? "-"}</Table.Cell>
+              <Table.Cell>{previousElectricity ?? "-"}</Table.Cell>
+              <Table.Cell>{electricityUsage}</Table.Cell>
+              <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>Số Nước</Table.Cell>
-              <Table.Cell>{currentNuoc ?? "-"}</Table.Cell>
-              <Table.Cell>{previousNuoc ?? "-"}</Table.Cell>
-              <Table.Cell>{consumptionNuoc}</Table.Cell>
-              <Table.Cell>{formatVND(nuocPrice)}</Table.Cell>
+              <Table.Cell>Số nước</Table.Cell>
+              <Table.Cell>{currentWater ?? "-"}</Table.Cell>
+              <Table.Cell>{previousWater ?? "-"}</Table.Cell>
+              <Table.Cell>{waterUsage}</Table.Cell>
+              <Table.Cell>{formatVND(waterCost)}</Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>Rác / Dịch vụ</Table.Cell>
+              <Table.Cell>Tiền rác</Table.Cell>
               <Table.Cell></Table.Cell>
               <Table.Cell></Table.Cell>
               <Table.Cell></Table.Cell>
-              <Table.Cell>{formatVND(servicePrice)}</Table.Cell>
+              <Table.Cell>{formatVND(trashFee)}</Table.Cell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>Tiền phòng</Table.Cell>
@@ -93,11 +96,13 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
               <Table.Cell>{formatVND(roomPrice)}</Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>Tổng cộng</Table.Cell>
+              <Table.Cell className="font-bold">Tổng cộng</Table.Cell>
               <Table.Cell></Table.Cell>
               <Table.Cell></Table.Cell>
               <Table.Cell></Table.Cell>
-              <Table.Cell>{formatVND(totalPrice)}</Table.Cell>
+              <Table.Cell className="font-bold text-primary">
+                {formatVND(totalCost)}
+              </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table.Content>
