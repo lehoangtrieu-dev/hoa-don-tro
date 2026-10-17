@@ -6,6 +6,7 @@ import { MonthPicker } from "./components/MonthPicker";
 import { RoomSelector } from "./components/RoomSelector";
 import { MeterInput } from "./components/MeterInput";
 import { MeterPhoto } from "./components/MeterPhoto";
+import { MeterOutput } from "./components/MeterOutput";
 import { LoadingModal } from "./components/LoadingModal";
 import { scanMeterWithGemini } from "./services/gemini";
 
@@ -112,6 +113,7 @@ export const App = () => {
         <MonthPicker month={month} setMonth={setMonth} />
       </div>
       <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
+      <MeterOutput month={month} data={data} house={house} room={room} />
       <MeterInput
         value={utilityRecord?.value}
         setValue={(val) => updateUtilityRecord({ value: val })}

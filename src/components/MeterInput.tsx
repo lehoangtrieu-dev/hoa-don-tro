@@ -13,8 +13,15 @@ export const MeterInput = ({ value, setValue, unit }: Props) => {
         className="field-sizing-content font-black text-4xl"
         value={value !== undefined ? String(value) : ""}
         onChange={(e) => {
-          const raw = e.target.value;
-          setValue(raw === "" ? undefined : Number(raw));
+          const text = e.target.value;
+          if (text === "") {
+            setValue(undefined);
+            return;
+          }
+          const raw = Number(text);
+          if (!isNaN(raw) && raw >= 0 && raw < 100000) {
+            setValue(raw);
+          }
         }}
         type="number"
         placeholder="Nhập số"
