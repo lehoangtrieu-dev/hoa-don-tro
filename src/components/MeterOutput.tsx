@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { Table } from "@heroui/react";
+import { ShareButton } from "./ShareButton";
 import { EditModal } from "./EditModal";
 import type { RentalData } from "../type";
 
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export const MeterOutput = ({ month, data, house, room }: Props) => {
+  const exportRef = useRef<HTMLDivElement>(null);
   const currentRecord = data[house]?.[room]?.[month];
 
   const prevMonth = getPreviousMonth(month);
@@ -57,7 +60,7 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
   return (
     <>
       <Table>
-        <Table.ScrollContainer>
+        <Table.ScrollContainer ref={exportRef}>
           <Table.Content aria-label={room} className="min-w-150">
             <Table.Header>
               <Table.Column isRowHeader>
@@ -110,7 +113,10 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
-      <EditModal />
+      <div className="flex gap-2">
+        <ShareButton room={room} month={month} exportRef={exportRef} />
+        <EditModal />
+      </div>
     </>
   );
 };
