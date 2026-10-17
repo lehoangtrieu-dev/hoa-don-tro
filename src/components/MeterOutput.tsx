@@ -1,4 +1,5 @@
 import { Table } from "@heroui/react";
+import { EditModal } from "./EditModal";
 import type { RentalData } from "../type";
 
 const getPreviousMonth = (monthStr: string): string => {
@@ -54,59 +55,62 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
   const totalCost = electricityCost + waterCost + roomPrice + trashFee;
 
   return (
-    <Table className="mt-8">
-      <Table.ScrollContainer>
-        <Table.Content aria-label={room} className="min-w-150">
-          <Table.Header>
-            <Table.Column isRowHeader>
-              {room} / {month}
-            </Table.Column>
-            <Table.Column>Mới</Table.Column>
-            <Table.Column>Cũ</Table.Column>
-            <Table.Column>Sử dụng</Table.Column>
-            <Table.Column>Thành tiền</Table.Column>
-          </Table.Header>
-          <Table.Body>
-            <Table.Row>
-              <Table.Cell>Số điện</Table.Cell>
-              <Table.Cell>{currentElectricity ?? "-"}</Table.Cell>
-              <Table.Cell>{previousElectricity ?? "-"}</Table.Cell>
-              <Table.Cell>{electricityUsage}</Table.Cell>
-              <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Số nước</Table.Cell>
-              <Table.Cell>{currentWater ?? "-"}</Table.Cell>
-              <Table.Cell>{previousWater ?? "-"}</Table.Cell>
-              <Table.Cell>{waterUsage}</Table.Cell>
-              <Table.Cell>{formatVND(waterCost)}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Tiền rác</Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell>{formatVND(trashFee)}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Tiền phòng</Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell>{formatVND(roomPrice)}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell className="font-bold">Tổng cộng</Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell></Table.Cell>
-              <Table.Cell className="font-bold text-primary">
-                {formatVND(totalCost)}
-              </Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Content>
-      </Table.ScrollContainer>
-    </Table>
+    <>
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content aria-label={room} className="min-w-150">
+            <Table.Header>
+              <Table.Column isRowHeader>
+                {room} / {month}
+              </Table.Column>
+              <Table.Column>Mới</Table.Column>
+              <Table.Column>Cũ</Table.Column>
+              <Table.Column>Sử dụng</Table.Column>
+              <Table.Column>Thành tiền</Table.Column>
+            </Table.Header>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell>Số điện</Table.Cell>
+                <Table.Cell>{currentElectricity ?? "-"}</Table.Cell>
+                <Table.Cell>{previousElectricity ?? "-"}</Table.Cell>
+                <Table.Cell>{electricityUsage}</Table.Cell>
+                <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>Số nước</Table.Cell>
+                <Table.Cell>{currentWater ?? "-"}</Table.Cell>
+                <Table.Cell>{previousWater ?? "-"}</Table.Cell>
+                <Table.Cell>{waterUsage}</Table.Cell>
+                <Table.Cell>{formatVND(waterCost)}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>Tiền rác</Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell>{formatVND(trashFee)}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>Tiền phòng</Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell>{formatVND(roomPrice)}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell className="font-bold">Tổng cộng</Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell></Table.Cell>
+                <Table.Cell className="font-bold text-primary">
+                  {formatVND(totalCost)}
+                </Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+      </Table>
+      <EditModal />
+    </>
   );
 };

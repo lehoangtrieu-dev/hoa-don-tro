@@ -113,16 +113,25 @@ export const App = () => {
         <MonthPicker month={month} setMonth={setMonth} />
       </div>
       <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
-      <MeterOutput month={month} data={data} house={house} room={room} />
-      <MeterInput
-        value={utilityRecord?.value}
-        setValue={(val) => updateUtilityRecord({ value: val })}
-        unit={utility === "electricity" ? "kWh" : "m³"}
-      />
-      <MeterPhoto
-        image={utilityRecord?.image}
-        setImage={(img) => updateUtilityRecord({ image: img })}
-      />
+      {room ? (
+        <>
+          <MeterOutput month={month} data={data} house={house} room={room} />
+          <MeterInput
+            value={utilityRecord?.value}
+            setValue={(val) => updateUtilityRecord({ value: val })}
+            unit={utility === "electricity" ? "kWh" : "m³"}
+          />
+          <MeterPhoto
+            image={utilityRecord?.image}
+            setImage={(img) => updateUtilityRecord({ image: img })}
+          />
+        </>
+      ) : (
+        <div className="text-center py-6 text-muted">
+          <p className="text-sm font-medium">Chưa có phòng trọ nào</p>
+          <p className="text-xs mt-1">Vào cài đặt để thêm phòng trọ đầu tiên</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -20,13 +20,11 @@ export function SettingsModal({ data, setData, houses }: Props) {
         <Modal.Container>
           <Modal.Dialog className="sm:max-w-90">
             <Modal.CloseTrigger />
-            <Modal.Header>
-              <div className="flex items-center gap-2">
-                <Modal.Icon className="bg-default text-foreground">
-                  <Gear className="size-5" />
-                </Modal.Icon>
-                <Modal.Heading>Cài đặt hệ thống</Modal.Heading>
-              </div>
+            <Modal.Header className="flex-row items-center">
+              <Modal.Icon className="bg-default text-foreground">
+                <Gear className="size-5" />
+              </Modal.Icon>
+              <Modal.Heading>Cài đặt hệ thống</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
               <Tabs>
