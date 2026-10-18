@@ -1,7 +1,24 @@
+import { useState } from "react";
 import { PencilToSquare } from "@gravity-ui/icons";
 import { Button, Modal, TextField, Label, Input } from "@heroui/react";
+import { type RoomConfig } from "./../type";
 
-export function EditModal() {
+interface Props {
+  config?: RoomConfig;
+  onSave: (fields: Partial<RoomConfig>) => void;
+}
+
+export function EditModal({ config, onSave }: Props) {
+  const [price, setPrice] = useState(config?.roomPrice?.toString() ?? "");
+  const [trash, setTrash] = useState(config?.trashFee?.toString() ?? "");
+
+  const handleSave = () => {
+    onSave({
+      roomPrice: price ? Number(price) : undefined,
+      trashFee: trash ? Number(trash) : undefined,
+    });
+  };
+
   return (
     <Modal>
       <Button variant="secondary">
@@ -25,7 +42,11 @@ export function EditModal() {
                 variant="secondary"
               >
                 <Label>Tiền rác</Label>
-                <Input placeholder="30,000" />
+                <Input
+                  value={trash}
+                  onChange={(e) => setTrash(e.target.value)}
+                  placeholder="30,000"
+                />
               </TextField>
               <TextField
                 className="w-full mt-4"
@@ -33,11 +54,15 @@ export function EditModal() {
                 variant="secondary"
               >
                 <Label>Tiền phòng</Label>
-                <Input placeholder="2,000,000" />
+                <Input
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="2,000,000"
+                />
               </TextField>
             </Modal.Body>
             <Modal.Footer>
-              <Button className="w-full" slot="close">
+              <Button className="w-full" slot="close" onPress={handleSave}>
                 Xong
               </Button>
             </Modal.Footer>

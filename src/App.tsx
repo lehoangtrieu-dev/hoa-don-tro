@@ -10,7 +10,12 @@ import { MeterOutput } from "./components/MeterOutput";
 import { LoadingModal } from "./components/LoadingModal";
 import { scanMeterWithGemini } from "./services/gemini";
 
-import { type RentalData, type UtilityRecord, type UtilityType } from "./type";
+import type {
+  RentalData,
+  UtilityRecord,
+  UtilityType,
+  RoomConfig,
+} from "./type";
 
 const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -54,6 +59,19 @@ export const App = () => {
       next[house].rooms[room].months[month][utility] ??= {};
 
       Object.assign(next[house].rooms[room].months[month][utility]!, fields);
+      return next;
+    });
+  };
+
+  const updateRoomConfig = (fields: Partial<RoomConfig>) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+
+      next[house] ??= { rooms: {} };
+      next[house].rooms[room] ??= { months: {} };
+      next[house].rooms[room].config ??= {};
+
+      Object.assign(next[house].rooms[room].config!, fields);
       return next;
     });
   };
@@ -119,7 +137,13 @@ export const App = () => {
       <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
       {room ? (
         utility === "bill" ? (
-          <MeterOutput month={month} data={data} house={house} room={room} />
+          <MeterOutput
+            month={month}
+            data={data}
+            house={house}
+            room={room}
+            updateRoomConfig={updateRoomConfig}
+          />
         ) : (
           <>
             <MeterInput

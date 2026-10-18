@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Table } from "@heroui/react";
 import { ShareButton } from "./ShareButton";
 import { EditModal } from "./EditModal";
-import type { RentalData } from "../type";
+import type { RentalData, RoomConfig } from "../type";
 
 const getPreviousMonth = (monthStr: string): string => {
   const [year, month] = monthStr.split("-").map(Number);
@@ -26,9 +26,16 @@ interface Props {
   data: RentalData;
   house: string;
   room: string;
+  updateRoomConfig: (fields: Partial<RoomConfig>) => void;
 }
 
-export const MeterOutput = ({ month, data, house, room }: Props) => {
+export const MeterOutput = ({
+  month,
+  data,
+  house,
+  room,
+  updateRoomConfig,
+}: Props) => {
   const exportRef = useRef<HTMLDivElement>(null);
   const currentRecord = data[house]?.rooms[room]?.months[month];
 
@@ -49,8 +56,10 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
 
   const electricityRate = 3500;
   const waterRate = 28000;
-  const trashFee = 30000;
-  const roomPrice = 2000000;
+
+  const roomConfig = data[house]?.rooms[room]?.config;
+  const roomPrice = roomConfig?.roomPrice ?? 0;
+  const trashFee = roomConfig?.trashFee ?? 30000;
 
   const electricityCost = electricityUsage * electricityRate;
   const waterCost = waterUsage * waterRate;
@@ -115,7 +124,7 @@ export const MeterOutput = ({ month, data, house, room }: Props) => {
       </Table>
       <div className="flex gap-2">
         <ShareButton room={room} month={month} exportRef={exportRef} />
-        <EditModal />
+        <EditModal key={room} config={roomConfig} onSave={updateRoomConfig} />
       </div>
     </>
   );
