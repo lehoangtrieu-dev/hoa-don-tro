@@ -127,7 +127,12 @@ export const MeterOutput = ({
       </Table>
       <div className="flex gap-2">
         <ShareButton room={room} month={month} exportRef={exportRef} />
-        <EditModal key={room} config={roomConfig} onSave={updateRoomConfig} />
+        <EditModal
+          key={room}
+          config={roomConfig}
+          houseConfig={houseConfig}
+          onSave={updateRoomConfig}
+        />
       </div>
     </>
   );

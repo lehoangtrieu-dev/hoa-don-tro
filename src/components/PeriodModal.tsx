@@ -7,7 +7,7 @@ import {
   TextField,
   Input,
 } from "@heroui/react";
-import { House, ChevronDown } from "@gravity-ui/icons";
+import { House, Calendar, ChevronDown } from "@gravity-ui/icons";
 
 interface Props {
   houses: string[];
@@ -55,7 +55,10 @@ export const PeriodModal = ({
                   if (key) setHouse(String(key));
                 }}
               >
-                <Label>Nhà trọ</Label>
+                <Label className="flex items-center gap-1.5">
+                  <House className="size-4" />
+                  Nhà trọ
+                </Label>
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />
@@ -76,7 +79,10 @@ export const PeriodModal = ({
                 type="month"
                 variant="secondary"
               >
-                <Label>Tháng ghi số</Label>
+                <Label className="flex items-center gap-1.5">
+                  <Calendar className="size-4" />
+                  Tháng ghi số
+                </Label>
                 <Input
                   value={month}
                   onChange={(e) => setMonth(e.currentTarget.value)}

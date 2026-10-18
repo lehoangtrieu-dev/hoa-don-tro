@@ -1,21 +1,30 @@
 import { useState } from "react";
-import { PencilToSquare } from "@gravity-ui/icons";
-import { Button, Modal, TextField, Label, Input } from "@heroui/react";
-import { type RoomConfig } from "./../type";
+import { PencilToSquare, TrashBin, House } from "@gravity-ui/icons";
+import { Button, Modal, TextField, Input, Label } from "@heroui/react";
+import type { RoomConfig, HouseConfig } from "./../type";
 
 interface Props {
   config?: RoomConfig;
+  houseConfig?: HouseConfig;
   onSave: (fields: Partial<RoomConfig>) => void;
 }
 
-export function EditModal({ config, onSave }: Props) {
+export function EditModal({ config, houseConfig, onSave }: Props) {
   const [price, setPrice] = useState(config?.roomPrice?.toString() ?? "");
   const [trash, setTrash] = useState(config?.trashFee?.toString() ?? "");
 
+  const defaultPriceText = houseConfig?.defaultRoomPrice
+    ? `${houseConfig.defaultRoomPrice.toLocaleString("vi-VN")}`
+    : "2.000.000";
+
+  const defaultTrashText = houseConfig?.defaultTrashFee
+    ? `${houseConfig.defaultTrashFee.toLocaleString("vi-VN")}`
+    : "30.000";
+
   const handleSave = () => {
     onSave({
-      roomPrice: price ? Number(price) : undefined,
-      trashFee: trash ? Number(trash) : undefined,
+      roomPrice: price.trim() === "" ? undefined : Number(price),
+      trashFee: trash.trim() === "" ? undefined : Number(trash),
     });
   };
 
@@ -41,24 +50,38 @@ export function EditModal({ config, onSave }: Props) {
                 type="number"
                 variant="secondary"
               >
-                <Label>Tiền rác</Label>
-                <Input
-                  value={trash}
-                  onChange={(e) => setTrash(e.target.value)}
-                  placeholder="30.000"
-                />
+                <Label className="flex items-center gap-1.5">
+                  <TrashBin className="size-4" />
+                  Tiền rác
+                </Label>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    className="w-full"
+                    value={trash}
+                    onChange={(e) => setTrash(e.target.value)}
+                    placeholder={defaultTrashText}
+                  />
+                  <span>đ</span>
+                </div>
               </TextField>
               <TextField
                 className="w-full mt-4"
                 type="number"
                 variant="secondary"
               >
-                <Label>Tiền phòng</Label>
-                <Input
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="2.000.000"
-                />
+                <Label className="flex items-center gap-1.5">
+                  <House className="size-4" />
+                  Tiền phòng
+                </Label>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    className="w-full"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder={defaultPriceText}
+                  />
+                  <span>đ</span>
+                </div>
               </TextField>
             </Modal.Body>
             <Modal.Footer>

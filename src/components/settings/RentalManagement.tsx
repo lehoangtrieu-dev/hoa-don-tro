@@ -157,7 +157,7 @@ export function RentalManagement({
                     />
 
                     <PriceInputItem
-                      icon={<TrashBin className="size-4 text-default-500" />}
+                      icon={<TrashBin className="size-4" />}
                       label="Tiền rác"
                       value={data[house]?.config?.defaultTrashFee}
                       placeholder="30.000"
@@ -168,7 +168,7 @@ export function RentalManagement({
                     />
 
                     <PriceInputItem
-                      icon={<House className="size-4 text-default-500" />}
+                      icon={<House className="size-4" />}
                       label="Tiền phòng"
                       value={data[house]?.config?.defaultRoomPrice}
                       placeholder="2.000.000"
