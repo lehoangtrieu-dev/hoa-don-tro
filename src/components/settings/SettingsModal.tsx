@@ -2,15 +2,21 @@ import { Gear } from "@gravity-ui/icons";
 import { Button, Modal, Tabs } from "@heroui/react";
 import { RentalManagement } from "./RentalManagement";
 import { AccountManagement } from "./AccountManagement";
-import { type RentalData } from "../../type";
+import type { RentalData, HouseConfig } from "../../type";
 
 interface Props {
   data: RentalData;
   setData: React.Dispatch<React.SetStateAction<RentalData>>;
   houses: string[];
+  updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
 }
 
-export function SettingsModal({ data, setData, houses }: Props) {
+export function SettingsModal({
+  data,
+  setData,
+  houses,
+  updateHouseConfig,
+}: Props) {
   return (
     <Modal>
       <Button variant="outline" isIconOnly>
@@ -45,6 +51,7 @@ export function SettingsModal({ data, setData, houses }: Props) {
                     data={data}
                     setData={setData}
                     houses={houses}
+                    updateHouseConfig={updateHouseConfig}
                   />
                 </Tabs.Panel>
                 <Tabs.Panel id="2">

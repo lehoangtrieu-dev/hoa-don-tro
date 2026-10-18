@@ -54,12 +54,15 @@ export const MeterOutput = ({
   );
   const waterUsage = calculateUsage(currentWater, previousWater);
 
-  const electricityRate = 3500;
-  const waterRate = 28000;
-
+  const houseConfig = data[house]?.config;
   const roomConfig = data[house]?.rooms[room]?.config;
-  const roomPrice = roomConfig?.roomPrice ?? 0;
-  const trashFee = roomConfig?.trashFee ?? 30000;
+
+  const electricityRate = houseConfig?.electricityRate ?? 3500;
+  const waterRate = houseConfig?.waterRate ?? 28000;
+
+  const roomPrice = roomConfig?.roomPrice ?? houseConfig?.defaultRoomPrice ?? 0;
+  const trashFee =
+    roomConfig?.trashFee ?? houseConfig?.defaultTrashFee ?? 30000;
 
   const electricityCost = electricityUsage * electricityRate;
   const waterCost = waterUsage * waterRate;

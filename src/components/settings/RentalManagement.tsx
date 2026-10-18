@@ -2,20 +2,28 @@ import { ChevronDown, Pencil, TrashBin, Plus } from "@gravity-ui/icons";
 import {
   Button,
   Accordion,
+  TextField,
   Input,
+  Label,
   Chip,
   CloseButton,
   Separator,
 } from "@heroui/react";
-import { type RentalData } from "../../type";
+import type { RentalData, HouseConfig } from "../../type";
 
 interface Props {
   data: RentalData;
   setData: React.Dispatch<React.SetStateAction<RentalData>>;
   houses: string[];
+  updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
 }
 
-export function RentalManagement({ data, setData, houses }: Props) {
+export function RentalManagement({
+  data,
+  setData,
+  houses,
+  updateHouseConfig,
+}: Props) {
   const handleRenameHouse = (oldName: string) => {
     const newName = prompt("Nhập tên mới cho nhà trọ:", oldName);
     if (newName && newName.trim() && newName !== oldName) {
@@ -81,6 +89,15 @@ export function RentalManagement({ data, setData, houses }: Props) {
     }
   };
 
+  const handleConfigChange = (
+    house: string,
+    field: keyof HouseConfig,
+    rawValue: string,
+  ) => {
+    const val = rawValue.trim() === "" ? undefined : Number(rawValue);
+    updateHouseConfig(house, { [field]: val });
+  };
+
   return (
     <>
       <Accordion className="w-full max-w-md">
@@ -113,6 +130,64 @@ export function RentalManagement({ data, setData, houses }: Props) {
                     <TrashBin />
                     Xóa nhà
                   </Button>
+                  <Separator className="my-4" />
+                  <h1 className="font-semibold text-sm mb-4">
+                    Bảng giá dịch vụ
+                  </h1>
+                  <div className="grid grid-cols-2 gap-2">
+                    <TextField type="number">
+                      <Label className="text-xs">Giá điện (đ/kWh)</Label>
+                      <Input
+                        value={data[house]?.config?.electricityRate ?? ""}
+                        placeholder="3,500"
+                        onChange={(e) =>
+                          handleConfigChange(
+                            house,
+                            "electricityRate",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </TextField>
+                    <TextField type="number">
+                      <Label className="text-xs">Giá nước (đ/m³)</Label>
+                      <Input
+                        value={data[house]?.config?.waterRate ?? ""}
+                        placeholder="28,000"
+                        onChange={(e) =>
+                          handleConfigChange(house, "waterRate", e.target.value)
+                        }
+                      />
+                    </TextField>
+                    <TextField type="number">
+                      <Label className="text-xs">Tiền rác mặc định</Label>
+                      <Input
+                        value={data[house]?.config?.defaultTrashFee ?? ""}
+                        placeholder="30,000"
+                        onChange={(e) =>
+                          handleConfigChange(
+                            house,
+                            "defaultTrashFee",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </TextField>
+                    <TextField type="number">
+                      <Label className="text-xs">Tiền phòng mặc định</Label>
+                      <Input
+                        value={data[house]?.config?.defaultRoomPrice ?? ""}
+                        placeholder="2,000,000"
+                        onChange={(e) =>
+                          handleConfigChange(
+                            house,
+                            "defaultRoomPrice",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </TextField>
+                  </div>
                   <Separator className="my-4" />
                   <h1 className="font-medium">Danh sách phòng</h1>
                   <form

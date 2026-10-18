@@ -14,6 +14,7 @@ import type {
   RentalData,
   UtilityRecord,
   UtilityType,
+  HouseConfig,
   RoomConfig,
 } from "./type";
 
@@ -59,6 +60,21 @@ export const App = () => {
       next[house].rooms[room].months[month][utility] ??= {};
 
       Object.assign(next[house].rooms[room].months[month][utility]!, fields);
+      return next;
+    });
+  };
+
+  const updateHouseConfig = (
+    houseName: string,
+    fields: Partial<HouseConfig>,
+  ) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+
+      next[houseName] ??= { rooms: {} };
+      next[houseName].config ??= {};
+
+      Object.assign(next[houseName].config!, fields);
       return next;
     });
   };
@@ -124,7 +140,12 @@ export const App = () => {
         }}
       />
       <div className="w-full flex justify-between items-center">
-        <SettingsModal data={data} setData={setData} houses={houses} />
+        <SettingsModal
+          data={data}
+          setData={setData}
+          houses={houses}
+          updateHouseConfig={updateHouseConfig}
+        />
         <PeriodModal
           houses={houses}
           house={house}
