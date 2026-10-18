@@ -1,4 +1,4 @@
-export type UtilityType = "electricity" | "water";
+export type UtilityType = "electricity" | "water" | "bill";
 
 export type RentalData = Record<
   string, // Tên nhà

@@ -1,5 +1,5 @@
 import { Tabs } from "@heroui/react";
-import { Thunderbolt, Droplet } from "@gravity-ui/icons";
+import { Thunderbolt, Droplet, Receipt } from "@gravity-ui/icons";
 import { type UtilityType } from "../type";
 
 interface Props {
@@ -25,6 +25,13 @@ export const UtilityTabs = ({ onSelect }: Props) => {
             <span className="flex items-center gap-1 text-cyan-600">
               <Droplet />
               Nước
+              <Tabs.Indicator />
+            </span>
+          </Tabs.Tab>
+          <Tabs.Tab id="bill">
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <Receipt />
+              Hóa đơn
               <Tabs.Indicator />
             </span>
           </Tabs.Tab>

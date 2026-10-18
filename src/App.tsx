@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import { Navbar } from "./components/Navbar";
+import { SettingsModal } from "./components/settings/SettingsModal";
 import { UtilityTabs } from "./components/UtilityTabs";
-import { MonthPicker } from "./components/MonthPicker";
+import { PeriodModal } from "./components/PeriodModal";
 import { RoomSelector } from "./components/RoomSelector";
 import { MeterInput } from "./components/MeterInput";
 import { MeterPhoto } from "./components/MeterPhoto";
@@ -38,9 +38,11 @@ export const App = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
-  const utilityRecord = data[house]?.[room]?.[month]?.[utility];
+  const utilityRecord =
+    utility !== "bill" ? data[house]?.[room]?.[month]?.[utility] : undefined;
 
   const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
+    if (utility === "bill") return;
     setData((prev) => {
       const next = structuredClone(prev);
 
@@ -49,7 +51,7 @@ export const App = () => {
       next[house][room][month] ??= {};
       next[house][room][month][utility] ??= {};
 
-      Object.assign(next[house][room][month][utility], fields);
+      Object.assign(next[house][room][month][utility]!, fields);
       return next;
     });
   };
@@ -101,31 +103,34 @@ export const App = () => {
           setScanError(null);
         }}
       />
-      <Navbar
-        data={data}
-        setData={setData}
-        houses={houses}
-        house={house}
-        setHouse={setSelectedHouse}
-      />
-      <div className="flex gap-2">
-        <UtilityTabs onSelect={setUtility} />
-        <MonthPicker month={month} setMonth={setMonth} />
+      <div className="w-full flex justify-between items-center">
+        <SettingsModal data={data} setData={setData} houses={houses} />
+        <PeriodModal
+          houses={houses}
+          house={house}
+          setHouse={setSelectedHouse}
+          month={month}
+          setMonth={setMonth}
+        />
       </div>
+      <UtilityTabs onSelect={setUtility} />
       <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
       {room ? (
-        <>
+        utility === "bill" ? (
           <MeterOutput month={month} data={data} house={house} room={room} />
-          <MeterInput
-            value={utilityRecord?.value}
-            setValue={(val) => updateUtilityRecord({ value: val })}
-            unit={utility === "electricity" ? "kWh" : "m³"}
-          />
-          <MeterPhoto
-            image={utilityRecord?.image}
-            setImage={(img) => updateUtilityRecord({ image: img })}
-          />
-        </>
+        ) : (
+          <>
+            <MeterInput
+              value={utilityRecord?.value}
+              setValue={(val) => updateUtilityRecord({ value: val })}
+              unit={utility === "electricity" ? "kWh" : "m³"}
+            />
+            <MeterPhoto
+              image={utilityRecord?.image}
+              setImage={(img) => updateUtilityRecord({ image: img })}
+            />
+          </>
+        )
       ) : (
         <div className="text-center py-6 text-muted">
           <p className="text-sm font-medium">Chưa có phòng trọ nào</p>
