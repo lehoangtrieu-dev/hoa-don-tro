@@ -3,9 +3,15 @@ import { Button, Input, Avatar, Label, Description } from "@heroui/react";
 import { Eye, EyeSlash } from "@gravity-ui/icons";
 import { ModelSelector } from "./ModelSelector";
 import Google from "/src/assets/google.svg";
+import { auth, googleProvider } from "./../../services/firebase";
+import { type User, signInWithPopup, signOut } from "firebase/auth";
 
-export const AccountManagement = () => {
-  const [user, setUser] = useState(false);
+interface Props {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+export const AccountManagement = ({ user, setUser }: Props) => {
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState(() => {
     const savedApiKey = localStorage.getItem("apiKey");
@@ -16,6 +22,24 @@ export const AccountManagement = () => {
     localStorage.setItem("apiKey", apiKey);
   }, [apiKey]);
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      setUser(result.user);
+    } catch (err) {
+      console.error("Google sign-in failed:", err);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (err) {
+      console.error("Google sign-out failed:", err);
+    }
+  };
+
   return (
     <>
       {user ? (
@@ -23,23 +47,18 @@ export const AccountManagement = () => {
           <div className="flex items-center gap-2">
             <Avatar size="sm">
               <Avatar.Image
-                alt="Bob"
-                src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/blue.jpg"
+                alt={user?.displayName || "Người dùng"}
+                src={user?.photoURL || ""}
               />
-              <Avatar.Fallback>B</Avatar.Fallback>
+              <Avatar.Fallback>{user?.displayName?.[0] || "U"}</Avatar.Fallback>
             </Avatar>
             <div className="flex flex-col">
-              <Label>Bob</Label>
-              <Description>bob@heroui.com</Description>
+              <Label>{user?.displayName || "Người dùng"}</Label>
+              <Description>{user?.email || ""}</Description>
             </div>
           </div>
           <div>
-            <Button
-              variant="danger-soft"
-              onPress={() => {
-                setUser(false);
-              }}
-            >
+            <Button variant="danger-soft" onPress={handleSignOut}>
               Đăng Xuất
             </Button>
           </div>
@@ -48,9 +67,7 @@ export const AccountManagement = () => {
         <Button
           variant="outline"
           className="w-full"
-          onPress={() => {
-            setUser(true);
-          }}
+          onPress={handleGoogleSignIn}
         >
           <img src={Google} alt="" />
           Đăng nhập bằng Google

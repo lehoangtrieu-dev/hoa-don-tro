@@ -9,7 +9,8 @@ import { MeterPhoto } from "./components/MeterPhoto";
 import { MeterOutput } from "./components/MeterOutput";
 import { LoadingModal } from "./components/LoadingModal";
 import { scanMeterWithGemini } from "./services/gemini";
-
+import { auth, loadFromFirestore, saveToFirestore } from "./services/firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import type {
   RentalData,
   UtilityRecord,
@@ -27,6 +28,21 @@ export const App = () => {
     const savedData = localStorage.getItem("data");
     return savedData ? JSON.parse(savedData) : {};
   });
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const cloudData = await loadFromFirestore(currentUser.uid);
+        if (cloudData && Object.keys(cloudData).length > 0) {
+          setData(cloudData);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const [utility, setUtility] = useState<UtilityType>("electricity");
   const [month, setMonth] = useState(`${yyyy}-${mm}`);
@@ -94,7 +110,19 @@ export const App = () => {
 
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
-  }, [data]);
+
+    if (!user) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        await saveToFirestore(user.uid, data);
+      } catch (err) {
+        console.error("Failed to sync data to Firestore:", err);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [data, user]);
 
   useEffect(() => {
     if (!utilityRecord?.image || utilityRecord?.value !== undefined) return;
@@ -145,6 +173,8 @@ export const App = () => {
           setData={setData}
           houses={houses}
           updateHouseConfig={updateHouseConfig}
+          user={user}
+          setUser={setUser}
         />
         <PeriodModal
           houses={houses}

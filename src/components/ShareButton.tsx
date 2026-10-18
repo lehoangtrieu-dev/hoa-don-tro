@@ -23,7 +23,7 @@ export const ShareButton = ({ room, month, exportRef }: Props) => {
         return;
       } catch (err: unknown) {
         if (err instanceof Error && err.name === "AbortError") return;
-        console.warn("Share failed, falling back to download", err);
+        console.warn("Native share failed, falling back to download:", err);
       }
     }
 
@@ -49,8 +49,8 @@ export const ShareButton = ({ room, month, exportRef }: Props) => {
       });
 
       handleShare(imageBlob);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error("Failed to render invoice image from DOM:", err);
     }
   };
 

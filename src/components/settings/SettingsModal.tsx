@@ -3,12 +3,15 @@ import { Button, Modal, Tabs } from "@heroui/react";
 import { RentalManagement } from "./RentalManagement";
 import { AccountManagement } from "./AccountManagement";
 import type { RentalData, HouseConfig } from "../../type";
+import { type User } from "firebase/auth";
 
 interface Props {
   data: RentalData;
   setData: React.Dispatch<React.SetStateAction<RentalData>>;
   houses: string[];
   updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 export function SettingsModal({
@@ -16,6 +19,8 @@ export function SettingsModal({
   setData,
   houses,
   updateHouseConfig,
+  user,
+  setUser,
 }: Props) {
   return (
     <Modal>
@@ -55,7 +60,7 @@ export function SettingsModal({
                   />
                 </Tabs.Panel>
                 <Tabs.Panel id="2">
-                  <AccountManagement />
+                  <AccountManagement user={user} setUser={setUser} />
                 </Tabs.Panel>
               </Tabs>
             </Modal.Body>
