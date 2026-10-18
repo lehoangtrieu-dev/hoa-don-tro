@@ -7,19 +7,44 @@ interface Props {
 }
 
 export const MeterPhoto = ({ image, setImage }: Props) => {
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-  ) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
-        setImage(base64);
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setImage(base64);
+    };
+    reader.readAsDataURL(file);
+
+    const uploadToCloudinary = async () => {
+      const CLOUD_NAME = "sglsq38j";
+      const UPLOAD_PRESET = "hoadontro_preset";
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      try {
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        const data = await res.json();
+        if (data.secure_url) {
+          setImage(data.secure_url);
+        }
+      } catch (err) {
+        console.error("Cloudinary upload failed:", err);
+      }
+    };
+
+    uploadToCloudinary();
   };
 
   return (
