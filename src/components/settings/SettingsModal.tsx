@@ -46,7 +46,7 @@ export function SettingsModal({
                     </Tabs.Tab>
                   </Tabs.List>
                 </Tabs.ListContainer>
-                <Tabs.Panel id="1">
+                <Tabs.Panel id="1" className="p-0">
                   <RentalManagement
                     data={data}
                     setData={setData}

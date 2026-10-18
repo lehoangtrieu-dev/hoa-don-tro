@@ -45,7 +45,7 @@ export function EditModal({ config, onSave }: Props) {
                 <Input
                   value={trash}
                   onChange={(e) => setTrash(e.target.value)}
-                  placeholder="30,000"
+                  placeholder="30.000"
                 />
               </TextField>
               <TextField
@@ -57,7 +57,7 @@ export function EditModal({ config, onSave }: Props) {
                 <Input
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  placeholder="2,000,000"
+                  placeholder="2.000.000"
                 />
               </TextField>
             </Modal.Body>

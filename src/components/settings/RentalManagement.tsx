@@ -1,14 +1,14 @@
-import { ChevronDown, Pencil, TrashBin, Plus } from "@gravity-ui/icons";
 import {
-  Button,
-  Accordion,
-  TextField,
-  Input,
-  Label,
-  Chip,
-  CloseButton,
-  Separator,
-} from "@heroui/react";
+  ChevronDown,
+  Pencil,
+  TrashBin,
+  Plus,
+  Thunderbolt,
+  Droplet,
+  House,
+} from "@gravity-ui/icons";
+import { Button, Accordion, Input, Chip, CloseButton } from "@heroui/react";
+import { PriceInputItem } from "./PriceInputItem";
 import type { RentalData, HouseConfig } from "../../type";
 
 interface Props {
@@ -105,7 +105,7 @@ export function RentalManagement({
           houses.map((house) => (
             <Accordion.Item key={house}>
               <Accordion.Heading>
-                <Accordion.Trigger>
+                <Accordion.Trigger className="text-lg font-bold">
                   {house}
                   <Accordion.Indicator>
                     <ChevronDown />
@@ -130,66 +130,55 @@ export function RentalManagement({
                     <TrashBin />
                     Xóa nhà
                   </Button>
-                  <Separator className="my-4" />
-                  <h1 className="font-semibold text-sm mb-4">
+                  <h1 className="font-semibold text-sm mb-2 mt-8">
                     Bảng giá dịch vụ
                   </h1>
-                  <div className="grid grid-cols-2 gap-2">
-                    <TextField type="number">
-                      <Label className="text-xs">Giá điện (đ/kWh)</Label>
-                      <Input
-                        value={data[house]?.config?.electricityRate ?? ""}
-                        placeholder="3,500"
-                        onChange={(e) =>
-                          handleConfigChange(
-                            house,
-                            "electricityRate",
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </TextField>
-                    <TextField type="number">
-                      <Label className="text-xs">Giá nước (đ/m³)</Label>
-                      <Input
-                        value={data[house]?.config?.waterRate ?? ""}
-                        placeholder="28,000"
-                        onChange={(e) =>
-                          handleConfigChange(house, "waterRate", e.target.value)
-                        }
-                      />
-                    </TextField>
-                    <TextField type="number">
-                      <Label className="text-xs">Tiền rác mặc định</Label>
-                      <Input
-                        value={data[house]?.config?.defaultTrashFee ?? ""}
-                        placeholder="30,000"
-                        onChange={(e) =>
-                          handleConfigChange(
-                            house,
-                            "defaultTrashFee",
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </TextField>
-                    <TextField type="number">
-                      <Label className="text-xs">Tiền phòng mặc định</Label>
-                      <Input
-                        value={data[house]?.config?.defaultRoomPrice ?? ""}
-                        placeholder="2,000,000"
-                        onChange={(e) =>
-                          handleConfigChange(
-                            house,
-                            "defaultRoomPrice",
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </TextField>
+                  <div className="rounded-xl border divide-y divide-border/50">
+                    <PriceInputItem
+                      icon={<Thunderbolt className="size-4 text-amber-600" />}
+                      label="Giá điện"
+                      value={data[house]?.config?.electricityRate}
+                      placeholder="3.500"
+                      unit="đ/kWh"
+                      onChange={(val: string) =>
+                        handleConfigChange(house, "electricityRate", val)
+                      }
+                    />
+
+                    <PriceInputItem
+                      icon={<Droplet className="size-4 text-cyan-600" />}
+                      label="Giá nước"
+                      value={data[house]?.config?.waterRate}
+                      placeholder="28.000"
+                      unit="đ/m³"
+                      onChange={(val: string) =>
+                        handleConfigChange(house, "waterRate", val)
+                      }
+                    />
+
+                    <PriceInputItem
+                      icon={<TrashBin className="size-4 text-default-500" />}
+                      label="Tiền rác"
+                      value={data[house]?.config?.defaultTrashFee}
+                      placeholder="30.000"
+                      unit="đ"
+                      onChange={(val: string) =>
+                        handleConfigChange(house, "defaultTrashFee", val)
+                      }
+                    />
+
+                    <PriceInputItem
+                      icon={<House className="size-4 text-default-500" />}
+                      label="Tiền phòng"
+                      value={data[house]?.config?.defaultRoomPrice}
+                      placeholder="2.000.000"
+                      unit="đ"
+                      onChange={(val: string) =>
+                        handleConfigChange(house, "defaultRoomPrice", val)
+                      }
+                    />
                   </div>
-                  <Separator className="my-4" />
-                  <h1 className="font-medium">Danh sách phòng</h1>
+                  <h1 className="font-medium mt-8">Danh sách phòng</h1>
                   <form
                     className="flex gap-2 mt-2 mb-4"
                     onSubmit={(e) => {
