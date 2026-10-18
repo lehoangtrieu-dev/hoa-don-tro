@@ -30,10 +30,10 @@ interface Props {
 
 export const MeterOutput = ({ month, data, house, room }: Props) => {
   const exportRef = useRef<HTMLDivElement>(null);
-  const currentRecord = data[house]?.[room]?.[month];
+  const currentRecord = data[house]?.rooms[room]?.months[month];
 
   const prevMonth = getPreviousMonth(month);
-  const previousRecord = data[house]?.[room]?.[prevMonth];
+  const previousRecord = data[house]?.rooms[room]?.months[prevMonth];
 
   const previousElectricity = previousRecord?.electricity?.value;
   const currentElectricity = currentRecord?.electricity?.value;

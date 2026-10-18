@@ -2,11 +2,31 @@ export type UtilityType = "electricity" | "water" | "bill";
 
 export type RentalData = Record<
   string, // Tên nhà
-  Record<
-    string, // Tên phòng
-    Record<string, MonthRecord> // Tháng -> { electricity, water }
-  >
+  {
+    config?: HouseConfig;
+    rooms: Record<
+      string, // Tên phòng
+      RoomData
+    >;
+  }
 >;
+
+export interface HouseConfig {
+  defaultRoomPrice?: number;
+  defaultTrashFee?: number;
+  electricityRate?: number;
+  waterRate?: number;
+}
+
+export interface RoomConfig {
+  roomPrice?: number;
+  trashFee?: number;
+}
+
+export interface RoomData {
+  config?: RoomConfig;
+  months: Record<string, MonthRecord>; // Tháng -> { electricity, water }
+}
 
 export interface MonthRecord {
   electricity?: UtilityRecord;

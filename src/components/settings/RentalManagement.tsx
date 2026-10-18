@@ -33,7 +33,7 @@ export function RentalManagement({ data, setData, houses }: Props) {
     if (name && name.trim()) {
       setData((prev) => ({
         ...prev,
-        [name.trim()]: {},
+        [name.trim()]: { rooms: {} },
       }));
     }
   };
@@ -57,7 +57,7 @@ export function RentalManagement({ data, setData, houses }: Props) {
         value.split(",").forEach((room) => {
           const trimmed = room.trim();
           if (trimmed) {
-            next[house][trimmed] ??= {};
+            next[house].rooms[trimmed] ??= { months: {} };
           }
         });
       }
@@ -74,7 +74,7 @@ export function RentalManagement({ data, setData, houses }: Props) {
       setData((prev) => {
         const next = structuredClone(prev);
         if (next[house]) {
-          delete next[house][room];
+          delete next[house].rooms[room];
         }
         return next;
       });
@@ -139,7 +139,7 @@ export function RentalManagement({ data, setData, houses }: Props) {
                     </Button>
                   </form>
                   <div className="flex flex-wrap gap-2">
-                    {Object.keys(data[house]).map((room) => (
+                    {Object.keys(data[house]?.rooms || {}).map((room) => (
                       <Chip key={room}>
                         {room}
                         <CloseButton

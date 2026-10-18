@@ -32,26 +32,28 @@ export const App = () => {
   const house =
     (houses.includes(selectedHouse) ? selectedHouse : houses[0]) || "";
 
-  const rooms = data[house] ? Object.keys(data[house]) : [];
+  const rooms = data[house]?.rooms ? Object.keys(data[house].rooms) : [];
   const room = (rooms.includes(selectedRoom) ? selectedRoom : rooms[0]) || "";
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
   const utilityRecord =
-    utility !== "bill" ? data[house]?.[room]?.[month]?.[utility] : undefined;
+    utility !== "bill"
+      ? data[house]?.rooms[room]?.months[month]?.[utility]
+      : undefined;
 
   const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
     if (utility === "bill") return;
     setData((prev) => {
       const next = structuredClone(prev);
 
-      next[house] ??= {};
-      next[house][room] ??= {};
-      next[house][room][month] ??= {};
-      next[house][room][month][utility] ??= {};
+      next[house] ??= { rooms: {} };
+      next[house].rooms[room] ??= { months: {} };
+      next[house].rooms[room].months[month] ??= {};
+      next[house].rooms[room].months[month][utility] ??= {};
 
-      Object.assign(next[house][room][month][utility]!, fields);
+      Object.assign(next[house].rooms[room].months[month][utility]!, fields);
       return next;
     });
   };
