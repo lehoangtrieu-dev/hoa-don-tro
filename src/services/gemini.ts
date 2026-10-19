@@ -1,5 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 
+async function urlToBase64(
+  url: string,
+): Promise<{ mimeType: string; data: string }> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const mimeType = blob.type || "image/jpeg";
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = (reader.result as string).split(",")[1] || "";
+      resolve({ mimeType, data: base64String });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 export async function scanMeterWithGemini(
   file?: string,
 ): Promise<number | null> {
@@ -10,10 +27,27 @@ export async function scanMeterWithGemini(
     throw new Error("Chưa cấu hình Gemini API Key trong Cài đặt!");
   }
 
+  if (!file) {
+    throw new Error("Không có ảnh để nhận diện!");
+  }
+
   const ai = new GoogleGenAI({ apiKey });
 
-  const mimeType = file?.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
-  const data = file?.split(",")[1] || "";
+  let mimeType = "image/jpeg";
+  let data = "";
+
+  if (file.startsWith("data:")) {
+    mimeType = file.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
+    data = file.split(",")[1] || "";
+  } else if (file.startsWith("http://") || file.startsWith("https://")) {
+    const fetched = await urlToBase64(file);
+    mimeType = fetched.mimeType;
+    data = fetched.data;
+  }
+
+  if (!data) {
+    throw new Error("Dữ liệu ảnh không hợp lệ. Vui lòng chụp lại ảnh.");
+  }
 
   const response = await ai.models.generateContent({
     model: model,

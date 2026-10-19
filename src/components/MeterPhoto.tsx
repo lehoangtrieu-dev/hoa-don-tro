@@ -6,45 +6,77 @@ interface Props {
   setImage: (val?: string) => void;
 }
 
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 1280;
+        const MAX_HEIGHT = 1280;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+        resolve(compressedBase64);
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export const MeterPhoto = ({ image, setImage }: Props) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
+    try {
+      const base64 = await compressImage(file);
       setImage(base64);
-    };
-    reader.readAsDataURL(file);
 
-    const uploadToCloudinary = async () => {
       const CLOUD_NAME = "sglsq38j";
       const UPLOAD_PRESET = "hoadontro_preset";
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", base64);
       formData.append("upload_preset", UPLOAD_PRESET);
 
-      try {
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-          {
-            method: "POST",
-            body: formData,
-          },
-        );
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
-        const data = await res.json();
-        if (data.secure_url) {
-          setImage(data.secure_url);
-        }
-      } catch (err) {
-        console.error("Cloudinary upload failed:", err);
+      const data = await res.json();
+      if (data.secure_url) {
+        setImage(data.secure_url);
       }
-    };
-
-    uploadToCloudinary();
+    } catch (err) {
+      console.error("Failed to process or upload image:", err);
+    }
   };
 
   return (
