@@ -4,10 +4,8 @@ export type RentalData = Record<
   string, // Tên nhà
   {
     config?: HouseConfig;
-    rooms: Record<
-      string, // Tên phòng
-      RoomData
-    >;
+    roomOrder?: string[];
+    rooms: Record<string, RoomData>;
   }
 >;
 

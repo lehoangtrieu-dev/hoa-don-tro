@@ -8,6 +8,7 @@ import { type User } from "firebase/auth";
 interface Props {
   data: RentalData;
   setData: React.Dispatch<React.SetStateAction<RentalData>>;
+  house: string;
   houses: string[];
   updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
   user: User | null;
@@ -17,6 +18,7 @@ interface Props {
 export function SettingsModal({
   data,
   setData,
+  house,
   houses,
   updateHouseConfig,
   user,
@@ -55,6 +57,7 @@ export function SettingsModal({
                   <RentalManagement
                     data={data}
                     setData={setData}
+                    house={house}
                     houses={houses}
                     updateHouseConfig={updateHouseConfig}
                   />

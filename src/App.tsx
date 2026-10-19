@@ -56,11 +56,13 @@ export const App = () => {
   const house =
     (houses.includes(selectedHouse) ? selectedHouse : houses[0]) || "";
 
-  const rooms = data[house]?.rooms
-    ? Object.keys(data[house].rooms).sort((a, b) =>
-        a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
-      )
-    : [];
+  const rooms =
+    data[house]?.roomOrder ??
+    (data[house]?.rooms
+      ? Object.keys(data[house].rooms).sort((a, b) =>
+          a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
+        )
+      : []);
   const room = (rooms.includes(selectedRoom) ? selectedRoom : rooms[0]) || "";
 
   const [isScanning, setIsScanning] = useState(false);
@@ -177,6 +179,7 @@ export const App = () => {
         <SettingsModal
           data={data}
           setData={setData}
+          house={house}
           houses={houses}
           updateHouseConfig={updateHouseConfig}
           user={user}

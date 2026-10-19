@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ChevronDown,
   Pencil,
@@ -6,14 +7,17 @@ import {
   Thunderbolt,
   Droplet,
   House,
+  ChevronLeft,
+  ChevronRight,
 } from "@gravity-ui/icons";
-import { Button, Accordion, Input, Chip, CloseButton } from "@heroui/react";
+import { Button, Accordion, Input, Chip } from "@heroui/react";
 import { PriceInputItem } from "./PriceInputItem";
 import type { RentalData, HouseConfig } from "../../type";
 
 interface Props {
   data: RentalData;
   setData: React.Dispatch<React.SetStateAction<RentalData>>;
+  house: string;
   houses: string[];
   updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
 }
@@ -21,6 +25,7 @@ interface Props {
 export function RentalManagement({
   data,
   setData,
+  house,
   houses,
   updateHouseConfig,
 }: Props) {
@@ -62,10 +67,18 @@ export function RentalManagement({
     setData((prev) => {
       const next = structuredClone(prev);
       if (next[house]) {
+        next[house].roomOrder ??= Object.keys(next[house].rooms);
+
         value.split(",").forEach((room) => {
           const trimmed = room.trim();
           if (trimmed) {
             next[house].rooms[trimmed] ??= { months: {} };
+            if (
+              next[house].roomOrder &&
+              !next[house].roomOrder.includes(trimmed)
+            ) {
+              next[house].roomOrder.push(trimmed);
+            }
           }
         });
       }
@@ -83,10 +96,44 @@ export function RentalManagement({
         const next = structuredClone(prev);
         if (next[house]) {
           delete next[house].rooms[room];
+
+          if (next[house].roomOrder) {
+            next[house].roomOrder = next[house].roomOrder.filter(
+              (r: string) => r !== room,
+            );
+          }
         }
         return next;
       });
     }
+  };
+
+  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+
+  const roomList =
+    data[house]?.roomOrder ?? Object.keys(data[house]?.rooms || {});
+
+  const handleMoveRoom = (direction: "left" | "right") => {
+    if (!selectedRoom) return;
+    const currentIndex = roomList.indexOf(selectedRoom);
+    if (currentIndex === -1) return;
+
+    const targetIndex =
+      direction === "left" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= roomList.length) return;
+
+    // Hoán đổi vị trí trong mảng
+    const newOrder = [...roomList];
+    [newOrder[currentIndex], newOrder[targetIndex]] = [
+      newOrder[targetIndex],
+      newOrder[currentIndex],
+    ];
+
+    setData((prev) => {
+      const next = structuredClone(prev);
+      next[house].roomOrder = newOrder;
+      return next;
+    });
   };
 
   const handleConfigChange = (
@@ -202,23 +249,64 @@ export function RentalManagement({
                       <Plus />
                     </Button>
                   </form>
+                  {/* Danh sách Chip phòng */}
                   <div className="flex flex-wrap gap-2">
-                    {Object.keys(data[house]?.rooms || {})
-                      .sort((a, b) =>
-                        a.localeCompare(b, undefined, {
-                          numeric: true,
-                          sensitivity: "base",
-                        }),
-                      )
-                      .map((room) => (
-                        <Chip key={room}>
+                    {roomList.map((room) => {
+                      const isSelected = room === selectedRoom;
+                      return (
+                        <Chip
+                          key={room}
+                          className={`cursor-pointer select-none hover:bg-default-hover ${
+                            isSelected &&
+                            "ring-1 ring-accent bg-primary-soft text-accent"
+                          }`}
+                          onClick={() =>
+                            setSelectedRoom(isSelected ? null : room)
+                          }
+                        >
                           {room}
-                          <CloseButton
-                            onPress={() => handleDeleteRoom(house, room)}
-                          ></CloseButton>
                         </Chip>
-                      ))}
+                      );
+                    })}
                   </div>
+
+                  {selectedRoom && (
+                    <div className="flex justify-center items-center gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        isIconOnly
+                        isDisabled={roomList.indexOf(selectedRoom) === 0}
+                        onPress={() => handleMoveRoom("left")}
+                      >
+                        <ChevronLeft className="size-4" />
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="danger-soft"
+                        isIconOnly
+                        onPress={() => {
+                          handleDeleteRoom(house, selectedRoom);
+                          setSelectedRoom(null);
+                        }}
+                      >
+                        <TrashBin className="size-4" />
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        isIconOnly
+                        isDisabled={
+                          roomList.indexOf(selectedRoom) === roomList.length - 1
+                        }
+                        onPress={() => handleMoveRoom("right")}
+                      >
+                        <ChevronRight className="size-4" />
+                      </Button>
+                    </div>
+                  )}
                 </Accordion.Body>
               </Accordion.Panel>
             </Accordion.Item>
