@@ -7,9 +7,17 @@ import {
   TextField,
   Input,
 } from "@heroui/react";
-import { House, Calendar, ChevronDown } from "@gravity-ui/icons";
+import {
+  House,
+  Calendar,
+  ChevronDown,
+  ArrowDownToLine,
+} from "@gravity-ui/icons";
+import { exportHouseBillingCSV } from "./../services/exportCsv";
+import type { RentalData } from "../type";
 
 interface Props {
+  data: RentalData;
   houses: string[];
   house: string;
   setHouse: React.Dispatch<React.SetStateAction<string>>;
@@ -23,6 +31,7 @@ export const PeriodModal = ({
   setHouse,
   month,
   setMonth,
+  data,
 }: Props) => {
   return (
     <Modal>
@@ -90,6 +99,12 @@ export const PeriodModal = ({
               </TextField>
             </Modal.Body>
             <Modal.Footer>
+              <Button
+                variant="outline"
+                onPress={() => exportHouseBillingCSV(house, month, data)}
+              >
+                <ArrowDownToLine /> Xuất Excel / CSV
+              </Button>
               <Button className="w-full" slot="close">
                 Xong
               </Button>

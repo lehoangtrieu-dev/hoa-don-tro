@@ -186,6 +186,7 @@ export const App = () => {
           setUser={setUser}
         />
         <PeriodModal
+          data={data}
           houses={houses}
           house={house}
           setHouse={setSelectedHouse}

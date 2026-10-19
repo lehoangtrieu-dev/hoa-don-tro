@@ -4,6 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/HoaDonTro/",
+  base: "/hoa-don-tro/",
   plugins: [react(), tailwindcss()],
 });
