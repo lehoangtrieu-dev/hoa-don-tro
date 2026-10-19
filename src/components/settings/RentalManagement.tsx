@@ -203,14 +203,21 @@ export function RentalManagement({
                     </Button>
                   </form>
                   <div className="flex flex-wrap gap-2">
-                    {Object.keys(data[house]?.rooms || {}).map((room) => (
-                      <Chip key={room}>
-                        {room}
-                        <CloseButton
-                          onPress={() => handleDeleteRoom(house, room)}
-                        ></CloseButton>
-                      </Chip>
-                    ))}
+                    {Object.keys(data[house]?.rooms || {})
+                      .sort((a, b) =>
+                        a.localeCompare(b, undefined, {
+                          numeric: true,
+                          sensitivity: "base",
+                        }),
+                      )
+                      .map((room) => (
+                        <Chip key={room}>
+                          {room}
+                          <CloseButton
+                            onPress={() => handleDeleteRoom(house, room)}
+                          ></CloseButton>
+                        </Chip>
+                      ))}
                   </div>
                 </Accordion.Body>
               </Accordion.Panel>

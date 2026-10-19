@@ -50,11 +50,17 @@ export const App = () => {
   const [selectedHouse, setSelectedHouse] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("");
 
-  const houses = Object.keys(data);
+  const houses = Object.keys(data).sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
+  );
   const house =
     (houses.includes(selectedHouse) ? selectedHouse : houses[0]) || "";
 
-  const rooms = data[house]?.rooms ? Object.keys(data[house].rooms) : [];
+  const rooms = data[house]?.rooms
+    ? Object.keys(data[house].rooms).sort((a, b) =>
+        a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
+      )
+    : [];
   const room = (rooms.includes(selectedRoom) ? selectedRoom : rooms[0]) || "";
 
   const [isScanning, setIsScanning] = useState(false);
