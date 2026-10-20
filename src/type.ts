@@ -1,4 +1,5 @@
 export type UtilityType = "electricity" | "water" | "bill";
+export type WaterBillingType = "m3" | "person";
 
 export type RentalData = Record<
   string, // Tên nhà
@@ -14,11 +15,13 @@ export interface HouseConfig {
   defaultTrashFee?: number;
   electricityRate?: number;
   waterRate?: number;
+  waterBillingType?: WaterBillingType;
 }
 
 export interface RoomConfig {
   roomPrice?: number;
   trashFee?: number;
+  peopleCount?: number;
 }
 
 export interface RoomData {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Alert } from "@heroui/react";
 
 import { SettingsModal } from "./components/settings/SettingsModal";
 import { UtilityTabs } from "./components/UtilityTabs";
@@ -207,6 +208,21 @@ export const App = () => {
           />
         ) : (
           <>
+            {utility === "water" &&
+              data[house]?.config?.waterBillingType === "person" && (
+                <Alert status="accent">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Title>
+                      Nhà này tính tiền nước <strong>theo số người</strong>
+                    </Alert.Title>
+                    <Alert.Description>
+                      Bạn có thể chỉnh số người ở trong tab{" "}
+                      <strong>Hóa đơn &gt; Chỉnh sửa</strong>.
+                    </Alert.Description>
+                  </Alert.Content>
+                </Alert>
+              )}
             <MeterInput
               value={utilityRecord?.value}
               setValue={(val) => updateUtilityRecord({ value: val })}

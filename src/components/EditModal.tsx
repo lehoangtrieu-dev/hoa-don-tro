@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { PencilToSquare, TrashBin, House } from "@gravity-ui/icons";
+import { useState, useEffect } from "react";
+import { PencilToSquare, TrashBin, House, Person } from "@gravity-ui/icons";
 import { Button, Modal, TextField, Input, Label } from "@heroui/react";
 import type { RoomConfig, HouseConfig } from "./../type";
 
@@ -12,6 +12,19 @@ interface Props {
 export function EditModal({ config, houseConfig, onSave }: Props) {
   const [price, setPrice] = useState(config?.roomPrice?.toString() ?? "");
   const [trash, setTrash] = useState(config?.trashFee?.toString() ?? "");
+  const [people, setPeople] = useState(
+    config?.peopleCount !== undefined ? config.peopleCount.toString() : "",
+  );
+
+  useEffect(() => {
+    setPrice(config?.roomPrice?.toString() ?? "");
+    setTrash(config?.trashFee?.toString() ?? "");
+    setPeople(
+      config?.peopleCount !== undefined ? config.peopleCount.toString() : "",
+    );
+  }, [config]);
+
+  const isWaterByPerson = houseConfig?.waterBillingType === "person";
 
   const defaultPriceText = houseConfig?.defaultRoomPrice
     ? `${houseConfig.defaultRoomPrice.toLocaleString("vi-VN")}`
@@ -25,6 +38,7 @@ export function EditModal({ config, houseConfig, onSave }: Props) {
     onSave({
       roomPrice: price.trim() === "" ? undefined : Number(price),
       trashFee: trash.trim() === "" ? undefined : Number(trash),
+      peopleCount: people.trim() === "" ? undefined : Number(people),
     });
   };
 
@@ -42,11 +56,34 @@ export function EditModal({ config, houseConfig, onSave }: Props) {
               <Modal.Icon className="bg-default text-foreground">
                 <PencilToSquare className="size-5" />
               </Modal.Icon>
-              <Modal.Heading>Chỉnh sửa giá phòng</Modal.Heading>
+              <Modal.Heading>Chỉnh sửa phòng</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
+              {isWaterByPerson && (
+                <TextField
+                  className="w-full mt-2"
+                  type="number"
+                  variant="secondary"
+                >
+                  <Label className="flex items-center gap-1.5">
+                    <Person className="size-4" />
+                    Số người ở (tính tiền nước)
+                  </Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      className="w-full"
+                      type="number"
+                      min={1}
+                      value={people}
+                      onChange={(e) => setPeople(e.target.value)}
+                      placeholder="1"
+                    />
+                    <span>người</span>
+                  </div>
+                </TextField>
+              )}
               <TextField
-                className="w-full mt-2"
+                className="w-full mt-3"
                 type="number"
                 variant="secondary"
               >
@@ -65,7 +102,7 @@ export function EditModal({ config, houseConfig, onSave }: Props) {
                 </div>
               </TextField>
               <TextField
-                className="w-full mt-4"
+                className="w-full mt-3"
                 type="number"
                 variant="secondary"
               >

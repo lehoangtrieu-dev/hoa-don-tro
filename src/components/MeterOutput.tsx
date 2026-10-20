@@ -57,15 +57,21 @@ export const MeterOutput = ({
   const houseConfig = data[house]?.config;
   const roomConfig = data[house]?.rooms[room]?.config;
 
+  const isWaterByPerson = houseConfig?.waterBillingType === "person";
+  const peopleCount = roomConfig?.peopleCount ?? 1;
+
   const electricityRate = houseConfig?.electricityRate ?? 3500;
-  const waterRate = houseConfig?.waterRate ?? 28000;
+  const waterRate =
+    houseConfig?.waterRate ?? (isWaterByPerson ? 100000 : 28000);
 
   const roomPrice = roomConfig?.roomPrice ?? houseConfig?.defaultRoomPrice ?? 0;
   const trashFee =
     roomConfig?.trashFee ?? houseConfig?.defaultTrashFee ?? 30000;
 
   const electricityCost = electricityUsage * electricityRate;
-  const waterCost = waterUsage * waterRate;
+  const waterCost = isWaterByPerson
+    ? peopleCount * waterRate
+    : waterUsage * waterRate;
 
   const totalCost = electricityCost + waterCost + roomPrice + trashFee;
 
@@ -92,10 +98,18 @@ export const MeterOutput = ({
                 <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell>Số nước</Table.Cell>
-                <Table.Cell>{currentWater ?? "-"}</Table.Cell>
-                <Table.Cell>{previousWater ?? "-"}</Table.Cell>
-                <Table.Cell>{waterUsage}</Table.Cell>
+                <Table.Cell>
+                  {isWaterByPerson ? "Tiền nước" : "Số nước"}
+                </Table.Cell>
+                <Table.Cell>
+                  {isWaterByPerson ? "-" : (currentWater ?? "-")}
+                </Table.Cell>
+                <Table.Cell>
+                  {isWaterByPerson ? "-" : (previousWater ?? "-")}
+                </Table.Cell>
+                <Table.Cell>
+                  {isWaterByPerson ? `${peopleCount} người` : waterUsage}
+                </Table.Cell>
                 <Table.Cell>{formatVND(waterCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
@@ -128,7 +142,7 @@ export const MeterOutput = ({
       <div className="flex gap-2">
         <ShareButton room={room} month={month} exportRef={exportRef} />
         <EditModal
-          key={room}
+          key={`${room}-${roomConfig?.peopleCount ?? ""}`}
           config={roomConfig}
           houseConfig={houseConfig}
           onSave={updateRoomConfig}

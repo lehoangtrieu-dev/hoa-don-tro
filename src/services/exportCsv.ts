@@ -17,8 +17,10 @@ export const exportHouseBillingCSV = (
   if (!houseData) return;
 
   const houseConfig = houseData.config;
+  const isWaterByPerson = houseConfig?.waterBillingType === "person";
   const electricityRate = houseConfig?.electricityRate ?? 3500;
-  const waterRate = houseConfig?.waterRate ?? 28000;
+  const waterRate =
+    houseConfig?.waterRate ?? (isWaterByPerson ? 100000 : 28000);
   const defaultTrash = houseConfig?.defaultTrashFee ?? 30000;
   const defaultRoomPrice = houseConfig?.defaultRoomPrice ?? 0;
 
@@ -35,7 +37,7 @@ export const exportHouseBillingCSV = (
     "Tiền điện",
     "Nước Mới",
     "Nước Cũ",
-    "Nước sd",
+    isWaterByPerson ? "Số người" : "Nước sd",
     "Tiền nước",
     "Tiền rác",
     "Tổng Tiền",
@@ -70,7 +72,11 @@ export const exportHouseBillingCSV = (
       waterNew !== undefined && waterOld !== undefined
         ? Math.max(0, waterNew - waterOld)
         : 0;
-    const waterCost = waterUsage * waterRate;
+
+    const peopleCount = roomConfig?.peopleCount ?? 1;
+    const waterCost = isWaterByPerson
+      ? peopleCount * waterRate
+      : waterUsage * waterRate;
 
     const roomPrice = roomConfig?.roomPrice ?? defaultRoomPrice;
     const trashCost = roomConfig?.trashFee ?? defaultTrash;
@@ -80,7 +86,9 @@ export const exportHouseBillingCSV = (
     totalRevenue += total;
     totalElecUsage += elecUsage;
     totalElecCost += elecCost;
-    totalWaterUsage += waterUsage;
+    if (!isWaterByPerson) {
+      totalWaterUsage += waterUsage;
+    }
     totalWaterCost += waterCost;
     totalTrashCost += trashCost;
     totalRoomPrice += roomPrice;
@@ -92,9 +100,9 @@ export const exportHouseBillingCSV = (
       elecOld ?? "",
       elecUsage,
       elecCost,
-      waterNew ?? "",
-      waterOld ?? "",
-      waterUsage,
+      isWaterByPerson ? "" : (waterNew ?? ""),
+      isWaterByPerson ? "" : (waterOld ?? ""),
+      isWaterByPerson ? `${peopleCount} ng` : waterUsage,
       waterCost,
       trashCost,
       total,
@@ -110,7 +118,7 @@ export const exportHouseBillingCSV = (
     totalElecCost,
     '""',
     '""',
-    totalWaterUsage,
+    isWaterByPerson ? '""' : totalWaterUsage,
     totalWaterCost,
     totalTrashCost,
     totalRevenue,

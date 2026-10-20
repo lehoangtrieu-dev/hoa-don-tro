@@ -196,8 +196,29 @@ export function RentalManagement({
                       icon={<Droplet className="size-4 text-cyan-600" />}
                       label="Giá nước"
                       value={data[house]?.config?.waterRate}
-                      placeholder="28.000"
-                      unit="đ/m³"
+                      placeholder={
+                        data[house]?.config?.waterBillingType === "person"
+                          ? "100.000"
+                          : "28.000"
+                      }
+                      unit={
+                        <Button
+                          variant="outline"
+                          className="text-[11px] text-inherit w-fit whitespace-nowrap px-1 h-7"
+                          onPress={() => {
+                            const current =
+                              data[house]?.config?.waterBillingType;
+                            updateHouseConfig(house, {
+                              waterBillingType:
+                                current === "person" ? "m3" : "person",
+                            });
+                          }}
+                        >
+                          {data[house]?.config?.waterBillingType === "person"
+                            ? "đ/người"
+                            : "đ/m³"}
+                        </Button>
+                      }
                       onChange={(val: string) =>
                         handleConfigChange(house, "waterRate", val)
                       }
@@ -322,10 +343,10 @@ export function RentalManagement({
       </Accordion>
       <Button
         variant="outline"
-        className="w-full mt-2"
-        onClick={handleAddHouse}
+        className="w-full mt-4"
+        onPress={handleAddHouse}
       >
-        <Plus /> Thêm nhà trọ mới
+        <Plus /> Thêm nhà trọ
       </Button>
     </>
   );
