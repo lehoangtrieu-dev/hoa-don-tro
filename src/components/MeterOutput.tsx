@@ -18,6 +18,9 @@ const calculateUsage = (currentValue?: number, previousValue?: number) => {
     : 0;
 };
 
+const formatNumber = (val?: number) =>
+  val !== undefined ? val.toLocaleString("vi-VN") : "-";
+
 const formatVND = (price: number) =>
   price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
@@ -77,7 +80,7 @@ export const MeterOutput = ({
 
   return (
     <>
-      <Table>
+      <Table className="[&_td]:text-2xl [&_th]:text-2xl [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap [&_th]:px-8 [&_td]:px-8">
         <Table.ScrollContainer ref={exportRef}>
           <Table.Content aria-label={room} className="min-w-150">
             <Table.Header>
@@ -92,9 +95,9 @@ export const MeterOutput = ({
             <Table.Body>
               <Table.Row>
                 <Table.Cell>Số điện</Table.Cell>
-                <Table.Cell>{currentElectricity ?? "-"}</Table.Cell>
-                <Table.Cell>{previousElectricity ?? "-"}</Table.Cell>
-                <Table.Cell>{electricityUsage}</Table.Cell>
+                <Table.Cell>{formatNumber(currentElectricity)}</Table.Cell>
+                <Table.Cell>{formatNumber(previousElectricity)}</Table.Cell>
+                <Table.Cell>{formatNumber(electricityUsage)}</Table.Cell>
                 <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
@@ -102,13 +105,15 @@ export const MeterOutput = ({
                   {isWaterByPerson ? "Tiền nước" : "Số nước"}
                 </Table.Cell>
                 <Table.Cell>
-                  {isWaterByPerson ? "-" : (currentWater ?? "-")}
+                  {isWaterByPerson ? "-" : formatNumber(currentWater)}
                 </Table.Cell>
                 <Table.Cell>
-                  {isWaterByPerson ? "-" : (previousWater ?? "-")}
+                  {isWaterByPerson ? "-" : formatNumber(previousWater)}
                 </Table.Cell>
                 <Table.Cell>
-                  {isWaterByPerson ? `${peopleCount} người` : waterUsage}
+                  {isWaterByPerson
+                    ? `${formatNumber(peopleCount)} người`
+                    : formatNumber(waterUsage)}
                 </Table.Cell>
                 <Table.Cell>{formatVND(waterCost)}</Table.Cell>
               </Table.Row>

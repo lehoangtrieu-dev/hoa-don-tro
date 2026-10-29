@@ -18,7 +18,7 @@ export const ShareButton = ({ room, month, exportRef }: Props) => {
       try {
         await navigator.share({
           files: [file],
-          title: `Hóa đơn phòng ${room}`,
+          title: `Phiếu thu ${room}`,
         });
         return;
       } catch (err: unknown) {
