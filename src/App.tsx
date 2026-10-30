@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Alert } from "@heroui/react";
 
 import { SettingsModal } from "./components/settings/SettingsModal";
@@ -68,6 +68,7 @@ export const App = () => {
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
+  const lastScannedKeyRef = useRef<string | null>(null);
 
   const utilityRecord =
     utility !== "bill"
@@ -134,7 +135,21 @@ export const App = () => {
   }, [data, user]);
 
   useEffect(() => {
-    if (!utilityRecord?.image || utilityRecord?.value !== undefined) return;
+    const currentKey = `${house}-${room}-${month}-${utility}`;
+
+    if (!utilityRecord?.image) {
+      lastScannedKeyRef.current = null;
+      return;
+    }
+
+    if (
+      utilityRecord?.value !== undefined ||
+      lastScannedKeyRef.current === currentKey
+    ) {
+      return;
+    }
+
+    lastScannedKeyRef.current = currentKey;
 
     const performScan = async () => {
       setIsScanning(true);
@@ -150,13 +165,11 @@ export const App = () => {
         }
 
         updateUtilityRecord({ value: scannedValue });
-        setIsScanning(false);
       } catch (err) {
         if (err instanceof Error) {
           const msg =
             err.message?.match(/"message":\s*"([^"]+)"/)?.[1] || err.message;
           setScanError(msg || "Đã xảy ra lỗi khi quét ảnh công tơ.");
-          setIsScanning(false);
         }
       } finally {
         setIsScanning(false);
@@ -164,7 +177,7 @@ export const App = () => {
     };
 
     performScan();
-  }, [utilityRecord?.image]);
+  }, [utilityRecord?.image, house, room, month, utility]);
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">

@@ -58,14 +58,24 @@ export async function scanMeterWithGemini(
           data: data,
         },
       },
-      `Identify and read the utility meter reading (electricity or water meter) in this image.
-- Read only the main counter digits representing the current consumption.
-- For mechanical meters, read the black integer digits and ignore red decimal digits or sub-dials.
-- Ignore serial numbers, model labels, barcodes, or voltage/frequency ratings.
-- Return ONLY the numeric digits. Do not include any units (e.g., kWh, m3), words, symbols, markdown formatting, or explanations.`,
+      `Analyze the provided image of the utility meter and extract the full numeric reading from the primary mechanical counter window according to these strict rules:
+
+      1. Orientation Check: Determine the correct upright orientation of the meter before reading. Meter markings (such as ACTARIS, m³, or bar) and numbers must be right-side up. In the correct upright orientation, the black digits are on the left and the red digits are on the right. If the photo is upside down, tilted, or sideways, adjust the orientation before reading.
+
+      2. Target Counter: Focus exclusively on the rectangular odometer roller window inside the dark frame. Ignore all circular needle dials, multiplier gauges (such as x0.1 or x0.0001), model names, serial numbers, and pressure ratings.
+
+      3. Complete Digit Capture: Read every digit wheel inside the rectangular counter from left to right, clearly distinguishing the black digits on the left from the red digits on the right. Look through reflections, water droplets, condensation, or dirt on the glass. If a roller is caught halfway between two numbers, read the digit that has settled into view.
+
+      4. Decimal Separation and Leading Zero Removal:
+      - Separate the black digits (whole units) and the red digits (fractional units) with a dot/decimal point (.) in the format: [black_digits].[red_digits].
+      - Remove all leading zeros from the black digits before the decimal point. For example, 0792 with red 19 becomes 792.19; 0665 with red 89 becomes 665.89; 0865 with red 80 becomes 865.80.
+      - If all black digits are zeros, retain a single 0 before the decimal point (e.g., 0.59).
+      - Do not alter, round, or omit any red digits after the decimal point.
+
+      5. Output Constraint: Return only the final formatted number as plain raw text. Do not include markdown formatting, code blocks, JSON, spaces, units (like m³), or explanatory text.`,
     ],
   });
 
   const cleanText = response.text?.trim().replace(/[^0-9.]/g, "");
-  return cleanText ? Number(cleanText) : null;
+  return cleanText ? Math.trunc(Number(cleanText)) : null;
 }
