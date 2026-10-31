@@ -10,7 +10,11 @@ import { MeterPhoto } from "./components/MeterPhoto";
 import { MeterOutput } from "./components/MeterOutput";
 import { LoadingModal } from "./components/LoadingModal";
 import { scanMeterWithGemini } from "./services/gemini";
-import { auth, loadFromFirestore, saveToFirestore } from "./services/firebase";
+import {
+  auth,
+  saveToFirestore,
+  subscribeToFirestore,
+} from "./services/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import type {
   RentalData,
@@ -31,18 +35,36 @@ export const App = () => {
   });
 
   const [user, setUser] = useState<User | null>(null);
+  const isRemoteUpdateRef = useRef(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    let unsubscribeFirestore: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+
       if (currentUser) {
-        const cloudData = await loadFromFirestore(currentUser.uid);
-        if (cloudData && Object.keys(cloudData).length > 0) {
-          setData(cloudData);
-        }
+        unsubscribeFirestore = subscribeToFirestore(
+          currentUser.uid,
+          (cloudData) => {
+            if (cloudData && Object.keys(cloudData).length > 0) {
+              isRemoteUpdateRef.current = true;
+              setData(cloudData);
+            }
+          },
+        );
       }
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeFirestore) unsubscribeFirestore();
+    };
   }, []);
 
   const [utility, setUtility] = useState<UtilityType>("electricity");
@@ -142,6 +164,11 @@ export const App = () => {
 
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
+
+    if (isRemoteUpdateRef.current) {
+      isRemoteUpdateRef.current = false;
+      return;
+    }
 
     if (!user) return;
 

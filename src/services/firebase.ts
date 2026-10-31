@@ -5,6 +5,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  onSnapshot,
   type DocumentData,
 } from "firebase/firestore";
 import { type RentalData } from "./../type";
@@ -41,4 +42,22 @@ export const loadFromFirestore = async (uid: string) => {
     return snap.data() as RentalData;
   }
   return null;
+};
+
+export const subscribeToFirestore = (
+  uid: string,
+  onData: (data: RentalData) => void,
+) => {
+  const userDocRef = doc(db, "users", uid);
+  return onSnapshot(
+    userDocRef,
+    (snap) => {
+      if (snap.exists()) {
+        onData(snap.data() as RentalData);
+      }
+    },
+    (err) => {
+      console.error("Firestore onSnapshot error:", err);
+    },
+  );
 };
