@@ -99,16 +99,14 @@ export const MeterOutput = ({
             </Table.Header>
             <Table.Body>
               <Table.Row>
-                <Table.Cell>Số điện</Table.Cell>
+                <Table.Cell><input defaultValue="Số điện" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
                 <Table.Cell>{formatNumber(currentElectricity)}</Table.Cell>
                 <Table.Cell>{formatNumber(previousElectricity)}</Table.Cell>
                 <Table.Cell>{formatNumber(electricityUsage)}</Table.Cell>
                 <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell>
-                  {isWaterByPerson ? "Tiền nước" : "Số nước"}
-                </Table.Cell>
+                <Table.Cell><input defaultValue={isWaterByPerson ? "Tiền nước" : "Số nước"} className="text-2xl field-sizing-content outline-0"/></Table.Cell>
                 <Table.Cell>
                   {isWaterByPerson ? "-" : formatNumber(currentWater)}
                 </Table.Cell>
@@ -123,14 +121,14 @@ export const MeterOutput = ({
                 <Table.Cell>{formatVND(waterCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell>Tiền rác</Table.Cell>
+                <Table.Cell><input defaultValue="Tiền rác" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell>{formatVND(trashFee)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell>Tiền phòng</Table.Cell>
+                <Table.Cell><input defaultValue="Tiền phòng" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
