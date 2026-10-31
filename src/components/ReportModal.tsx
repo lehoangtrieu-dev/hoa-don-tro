@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { Modal, Button, Table } from "@heroui/react";
-import {
-  ArrowDownToLine,
-  LayoutHeaderCellsLarge,
-} from "@gravity-ui/icons";
+import { ArrowDownToLine, LayoutHeaderCellsLarge } from "@gravity-ui/icons";
 import {
   generateHouseBillingReport,
   downloadBillingReportCSV,
@@ -36,7 +33,7 @@ export const ReportModal = ({ isOpen, onClose, house, month, data }: Props) => {
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop>
         <Modal.Container>
-          <Modal.Dialog className="max-w-4xl w-[95vw]">
+          <Modal.Dialog className="max-w-full">
             <Modal.CloseTrigger />
             <Modal.Header className="flex-row items-center">
               <Modal.Icon className="bg-default text-foreground">

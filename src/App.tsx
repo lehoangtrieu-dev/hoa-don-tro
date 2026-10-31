@@ -229,7 +229,7 @@ export const App = () => {
   }, [utilityRecord?.image, house, room, month, utility]);
 
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col justify-center items-center p-6 gap-4">
+    <div className="w-full lg:max-w-5xl mx-auto flex flex-col items-center p-4 md:py-8 md:px-6 gap-4 md:gap-6 min-h-screen">
       <LoadingModal
         isOpen={isScanning || !!scanError}
         error={scanError}
@@ -238,7 +238,7 @@ export const App = () => {
           setScanError(null);
         }}
       />
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex justify-between items-center max-w-xs">
         <SettingsModal
           data={data}
           setData={setData}
@@ -272,7 +272,7 @@ export const App = () => {
           <>
             {utility === "water" &&
               data[house]?.config?.waterBillingType === "person" && (
-                <Alert status="accent">
+                <Alert status="accent" className="w-full max-w-xs">
                   <Alert.Indicator />
                   <Alert.Content>
                     <Alert.Title>

@@ -31,7 +31,7 @@ export function SettingsModal({
       </Button>
       <Modal.Backdrop>
         <Modal.Container>
-          <Modal.Dialog className="sm:max-w-90">
+          <Modal.Dialog className="sm:max-w-md md:max-w-lg">
             <Modal.CloseTrigger />
             <Modal.Header className="flex-row items-center">
               <Modal.Icon className="bg-default text-foreground">

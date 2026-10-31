@@ -83,7 +83,7 @@ export const MeterPhoto = ({ image, setImage }: Props) => {
     <div className="relative">
       {image ? (
         <>
-          <img className="rounded-3xl" src={image} alt="Ảnh công tơ" />
+          <img className="rounded-3xl max-w-xs sm:max-w-sm" src={image} alt="Ảnh công tơ" />
           <Button
             className="absolute top-0 right-0 m-2"
             variant="danger"
