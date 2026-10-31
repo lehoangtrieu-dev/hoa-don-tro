@@ -169,7 +169,7 @@ export const MeterOutput = ({
       </Table>
       <TextArea
         aria-label="Ghi chú"
-        className="w-full"
+        className="w-full h-32 border-background-secondary border-5"
         placeholder="Ghi chú"
         value={roomConfig?.note ?? ""}
         onChange={(e) => updateRoomConfig({ note: e.target.value })}

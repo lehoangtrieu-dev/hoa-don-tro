@@ -180,7 +180,7 @@ export function RentalManagement({
                   <h1 className="font-semibold text-sm mb-2 mt-8">
                     Bảng giá dịch vụ
                   </h1>
-                  <div className="rounded-xl border divide-y divide-border/50">
+                  <div className="sm:max-w-xs rounded-xl border divide-y divide-border/50">
                     <PriceInputItem
                       icon={<Thunderbolt className="size-4 text-amber-600" />}
                       label="Giá điện"

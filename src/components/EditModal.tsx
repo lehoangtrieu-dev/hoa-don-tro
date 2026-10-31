@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PencilToSquare, TrashBin, House, Person } from "@gravity-ui/icons";
 import { Button, Modal, TextField, Input, Label } from "@heroui/react";
 import type { RoomConfig, HouseConfig } from "./../type";
@@ -16,13 +16,13 @@ export function EditModal({ config, houseConfig, onSave }: Props) {
     config?.peopleCount !== undefined ? config.peopleCount.toString() : "",
   );
 
-  useEffect(() => {
+  const resetForm = () => {
     setPrice(config?.roomPrice?.toString() ?? "");
     setTrash(config?.trashFee?.toString() ?? "");
     setPeople(
       config?.peopleCount !== undefined ? config.peopleCount.toString() : "",
     );
-  }, [config]);
+  };
 
   const isWaterByPerson = houseConfig?.waterBillingType === "person";
 
@@ -43,7 +43,7 @@ export function EditModal({ config, houseConfig, onSave }: Props) {
   };
 
   return (
-    <Modal>
+    <Modal onOpenChange={(isOpen) => isOpen && resetForm()}>
       <Button variant="secondary">
         <PencilToSquare />
         Chỉnh sửa

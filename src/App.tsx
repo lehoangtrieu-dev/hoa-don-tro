@@ -28,10 +28,52 @@ const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
 const yyyy = today.getFullYear();
 
+const cleanExpiredMonths = (rawData: RentalData): RentalData => {
+  const autoDeleteSetting = localStorage.getItem("autoDeleteMonths") || "never";
+  if (autoDeleteSetting === "never") return rawData;
+
+  const thresholdMonths = Number(autoDeleteSetting);
+  if (isNaN(thresholdMonths) || thresholdMonths <= 0) return rawData;
+
+  const currentDate = new Date();
+  const currentMonthIndex =
+    currentDate.getFullYear() * 12 + currentDate.getMonth();
+
+  let hasChanged = false;
+  const nextData = structuredClone(rawData);
+
+  for (const houseKey of Object.keys(nextData)) {
+    const houseObj = nextData[houseKey];
+    if (!houseObj?.rooms) continue;
+
+    for (const roomKey of Object.keys(houseObj.rooms)) {
+      const roomObj = houseObj.rooms[roomKey];
+      if (!roomObj?.months) continue;
+
+      for (const mStr of Object.keys(roomObj.months)) {
+        const [yearStr, monthStr] = mStr.split("-");
+        const y = Number(yearStr);
+        const m = Number(monthStr);
+
+        if (!isNaN(y) && !isNaN(m)) {
+          const recordMonthIndex = y * 12 + (m - 1);
+          if (currentMonthIndex - recordMonthIndex > thresholdMonths) {
+            delete roomObj.months[mStr];
+            hasChanged = true;
+          }
+        }
+      }
+    }
+  }
+
+  return hasChanged ? nextData : rawData;
+};
+
 export const App = () => {
   const [data, setData] = useState<RentalData>(() => {
     const savedData = localStorage.getItem("data");
-    return savedData ? JSON.parse(savedData) : {};
+    const parsed: RentalData = savedData ? JSON.parse(savedData) : {};
+    return cleanExpiredMonths(parsed);
   });
 
   const [user, setUser] = useState<User | null>(null);
@@ -54,7 +96,7 @@ export const App = () => {
           (cloudData) => {
             if (cloudData && Object.keys(cloudData).length > 0) {
               isRemoteUpdateRef.current = true;
-              setData(cloudData);
+              setData(cleanExpiredMonths(cloudData));
             }
           },
         );
