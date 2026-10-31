@@ -1,5 +1,35 @@
 import type { RentalData } from "../type";
 
+export interface BillingRow {
+  room: string;
+  roomPrice: number;
+  elecNew?: number;
+  elecOld?: number;
+  elecUsage: number;
+  elecCost: number;
+  waterNew?: number;
+  waterOld?: number;
+  waterUsage: number;
+  peopleCount: number;
+  waterCost: number;
+  trashCost: number;
+  total: number;
+}
+
+export interface HouseBillingReport {
+  house: string;
+  month: string;
+  isWaterByPerson: boolean;
+  rows: BillingRow[];
+  totalRoomPrice: number;
+  totalElecUsage: number;
+  totalElecCost: number;
+  totalWaterUsage: number;
+  totalWaterCost: number;
+  totalTrashCost: number;
+  totalRevenue: number;
+}
+
 const getPreviousMonth = (monthStr: string): string => {
   const [year, month] = monthStr.split("-").map(Number);
   const prevDate = new Date(year, month - 2, 1);
@@ -8,13 +38,13 @@ const getPreviousMonth = (monthStr: string): string => {
   return `${yyyy}-${mm}`;
 };
 
-export const exportHouseBillingCSV = (
+export const generateHouseBillingReport = (
   house: string,
   month: string,
   data: RentalData,
-) => {
+): HouseBillingReport | null => {
   const houseData = data[house];
-  if (!houseData) return;
+  if (!houseData) return null;
 
   const houseConfig = houseData.config;
   const isWaterByPerson = houseConfig?.waterBillingType === "person";
@@ -25,23 +55,7 @@ export const exportHouseBillingCSV = (
   const defaultRoomPrice = houseConfig?.defaultRoomPrice ?? 0;
 
   const prevMonth = getPreviousMonth(month);
-
   const roomList = houseData.roomOrder ?? Object.keys(houseData.rooms || {});
-
-  const headers = [
-    "Tên phòng",
-    "Tiền phòng",
-    "Điện Mới",
-    "Điện Cũ",
-    "Điện sử dụng",
-    "Tiền điện",
-    "Nước Mới",
-    "Nước Cũ",
-    isWaterByPerson ? "Số người" : "Nước sd",
-    "Tiền nước",
-    "Tiền rác",
-    "Tổng Tiền",
-  ];
 
   let totalRevenue = 0;
   let totalElecUsage = 0;
@@ -51,7 +65,7 @@ export const exportHouseBillingCSV = (
   let totalTrashCost = 0;
   let totalRoomPrice = 0;
 
-  const rows = roomList.map((room) => {
+  const rows: BillingRow[] = roomList.map((room) => {
     const roomData = houseData.rooms[room];
     const roomConfig = roomData?.config;
 
@@ -80,7 +94,6 @@ export const exportHouseBillingCSV = (
 
     const roomPrice = roomConfig?.roomPrice ?? defaultRoomPrice;
     const trashCost = roomConfig?.trashFee ?? defaultTrash;
-
     const total = roomPrice + elecCost + waterCost + trashCost;
 
     totalRevenue += total;
@@ -93,35 +106,84 @@ export const exportHouseBillingCSV = (
     totalTrashCost += trashCost;
     totalRoomPrice += roomPrice;
 
-    return [
-      `"${room}"`,
+    return {
+      room,
       roomPrice,
-      elecNew ?? "",
-      elecOld ?? "",
+      elecNew,
+      elecOld,
       elecUsage,
       elecCost,
-      isWaterByPerson ? "" : (waterNew ?? ""),
-      isWaterByPerson ? "" : (waterOld ?? ""),
-      isWaterByPerson ? `${peopleCount} ng` : waterUsage,
+      waterNew,
+      waterOld,
+      waterUsage,
+      peopleCount,
       waterCost,
       trashCost,
       total,
-    ].join(",");
+    };
   });
 
-  const summaryRow = [
-    '"TỔNG CỘNG"',
+  return {
+    house,
+    month,
+    isWaterByPerson,
+    rows,
     totalRoomPrice,
-    '""',
-    '""',
     totalElecUsage,
     totalElecCost,
-    '""',
-    '""',
-    isWaterByPerson ? '""' : totalWaterUsage,
+    totalWaterUsage,
     totalWaterCost,
     totalTrashCost,
     totalRevenue,
+  };
+};
+
+export const downloadBillingReportCSV = (report: HouseBillingReport) => {
+  const headers = [
+    "Tên phòng",
+    "Tiền phòng",
+    "Điện Mới",
+    "Điện Cũ",
+    "Điện sử dụng",
+    "Tiền điện",
+    "Nước Mới",
+    "Nước Cũ",
+    report.isWaterByPerson ? "Số người" : "Nước sd",
+    "Tiền nước",
+    "Tiền rác",
+    "Tổng Tiền",
+  ];
+
+  const rows = report.rows.map((row) =>
+    [
+      `"${row.room.replace(/"/g, '""')}"`,
+      row.roomPrice,
+      row.elecNew ?? "",
+      row.elecOld ?? "",
+      row.elecUsage,
+      row.elecCost,
+      report.isWaterByPerson ? "" : (row.waterNew ?? ""),
+      report.isWaterByPerson ? "" : (row.waterOld ?? ""),
+      report.isWaterByPerson ? `${row.peopleCount} ng` : row.waterUsage,
+      row.waterCost,
+      row.trashCost,
+      row.total,
+    ].join(","),
+  );
+
+  const summaryRow = [
+    '"TỔNG CỘNG"',
+    report.totalRoomPrice,
+    '""',
+    '""',
+    report.totalElecUsage,
+    report.totalElecCost,
+    '""',
+    '""',
+    report.isWaterByPerson ? '""' : report.totalWaterUsage,
+    report.totalWaterCost,
+    report.totalTrashCost,
+    report.totalRevenue,
   ].join(",");
 
   const csvContent = [headers.join(","), ...rows, summaryRow].join("\r\n");
@@ -133,7 +195,18 @@ export const exportHouseBillingCSV = (
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `HoaDonTro-${house}-${month}.csv`;
+  link.download = `HoaDonTro-${report.house}-${report.month}.csv`;
   link.click();
   URL.revokeObjectURL(url);
+};
+
+export const exportHouseBillingCSV = (
+  house: string,
+  month: string,
+  data: RentalData,
+) => {
+  const report = generateHouseBillingReport(house, month, data);
+  if (report) {
+    downloadBillingReportCSV(report);
+  }
 };

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Modal,
   Button,
@@ -11,9 +12,9 @@ import {
   House,
   Calendar,
   ChevronDown,
-  ArrowDownToLine,
+  LayoutHeaderCellsLarge,
 } from "@gravity-ui/icons";
-import { exportHouseBillingCSV } from "./../services/exportCsv";
+import { ReportModal } from "./ReportModal";
 import type { RentalData } from "../type";
 
 interface Props {
@@ -33,85 +34,109 @@ export const PeriodModal = ({
   setMonth,
   data,
 }: Props) => {
-  return (
-    <Modal>
-      <Button variant="outline" className="rounded-full">
-        <House className="size-4" />
-        <span>
-          {house || "Chọn nhà"} • {month}
-        </span>
-        <ChevronDown className="size-4 text-muted" />
-      </Button>
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isPeriodOpen, setIsPeriodOpen] = useState(false);
 
-      <Modal.Backdrop>
-        <Modal.Container>
-          <Modal.Dialog className="sm:max-w-90">
-            <Modal.CloseTrigger />
-            <Modal.Header className="flex-row items-center">
-              <Modal.Icon className="bg-default text-foreground">
-                <House className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>Chọn nhà & tháng</Modal.Heading>
-            </Modal.Header>
-            <Modal.Body>
-              <Select
-                className="mt-2"
-                variant="secondary"
-                aria-label="Chọn Nhà Trọ"
-                placeholder="—"
-                value={house}
-                onChange={(key) => {
-                  if (key) setHouse(String(key));
-                }}
-              >
-                <Label className="flex items-center gap-1.5">
-                  <House className="size-4" />
-                  Nhà trọ
-                </Label>
-                <Select.Trigger>
-                  <Select.Value />
-                  <Select.Indicator />
-                </Select.Trigger>
-                <Select.Popover>
-                  <ListBox>
-                    {houses.map((value) => (
-                      <ListBox.Item id={value} key={value} textValue={value}>
-                        {value}
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    ))}
-                  </ListBox>
-                </Select.Popover>
-              </Select>
-              <TextField
-                className="w-full mt-4"
-                type="month"
-                variant="secondary"
-              >
-                <Label className="flex items-center gap-1.5">
-                  <Calendar className="size-4" />
-                  Tháng ghi số
-                </Label>
-                <Input
-                  value={month}
-                  onChange={(e) => setMonth(e.currentTarget.value)}
-                />
-              </TextField>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button
-                variant="outline"
-                onPress={() => exportHouseBillingCSV(house, month, data)}
-              >
-                <ArrowDownToLine /> Xuất Excel / CSV
-              </Button>
-              <Button className="w-full" slot="close">
-                Xong
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
+  return (
+    <>
+      <Modal isOpen={isPeriodOpen} onOpenChange={setIsPeriodOpen}>
+        <Button
+          variant="outline"
+          className="rounded-full"
+          onPress={() => setIsPeriodOpen(true)}
+        >
+          <House className="size-4" />
+          <span>
+            {house || "Chọn nhà"} • {month}
+          </span>
+          <ChevronDown className="size-4 text-muted" />
+        </Button>
+
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-90">
+              <Modal.CloseTrigger />
+              <Modal.Header className="flex-row items-center">
+                <Modal.Icon className="bg-default text-foreground">
+                  <House className="size-5" />
+                </Modal.Icon>
+                <Modal.Heading>Chọn nhà & tháng</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <Select
+                  className="mt-2"
+                  variant="secondary"
+                  aria-label="Chọn Nhà Trọ"
+                  placeholder="—"
+                  value={house}
+                  onChange={(key) => {
+                    if (key) setHouse(String(key));
+                  }}
+                >
+                  <Label className="flex items-center gap-1.5">
+                    <House className="size-4" />
+                    Nhà trọ
+                  </Label>
+                  <Select.Trigger>
+                    <Select.Value />
+                    <Select.Indicator />
+                  </Select.Trigger>
+                  <Select.Popover>
+                    <ListBox>
+                      {houses.map((value) => (
+                        <ListBox.Item id={value} key={value} textValue={value}>
+                          {value}
+                          <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                      ))}
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+                <TextField
+                  className="w-full mt-4"
+                  type="month"
+                  variant="secondary"
+                >
+                  <Label className="flex items-center gap-1.5">
+                    <Calendar className="size-4" />
+                    Tháng ghi số
+                  </Label>
+                  <Input
+                    value={month}
+                    onChange={(e) => setMonth(e.currentTarget.value)}
+                  />
+                </TextField>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="outline"
+                  onPress={() => {
+                    setIsPeriodOpen(false);
+                    setIsReportOpen(true);
+                  }}
+                >
+                  <LayoutHeaderCellsLarge /> Xem báo cáo
+                </Button>
+                <Button
+                  className="w-full"
+                  slot="close"
+                  onPress={() => setIsPeriodOpen(false)}
+                >
+                  Xong
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+
+      <ReportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        house={house}
+        month={month}
+        data={data}
+      />
+    </>
   );
 };
