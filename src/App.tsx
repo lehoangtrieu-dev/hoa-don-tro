@@ -46,10 +46,32 @@ export const App = () => {
   }, []);
 
   const [utility, setUtility] = useState<UtilityType>("electricity");
-  const [month, setMonth] = useState(`${yyyy}-${mm}`);
+  const [month, setMonth] = useState(() => {
+    return localStorage.getItem("selectedMonth") || `${yyyy}-${mm}`;
+  });
 
-  const [selectedHouse, setSelectedHouse] = useState("");
-  const [selectedRoom, setSelectedRoom] = useState("");
+  const [selectedHouse, setSelectedHouse] = useState(() => {
+    return localStorage.getItem("selectedHouse") || "";
+  });
+  const [selectedRoom, setSelectedRoom] = useState(() => {
+    return localStorage.getItem("selectedRoom") || "";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("selectedMonth", month);
+  }, [month]);
+
+  useEffect(() => {
+    if (selectedHouse) {
+      localStorage.setItem("selectedHouse", selectedHouse);
+    }
+  }, [selectedHouse]);
+
+  useEffect(() => {
+    if (selectedRoom) {
+      localStorage.setItem("selectedRoom", selectedRoom);
+    }
+  }, [selectedRoom]);
 
   const houses = Object.keys(data).sort((a, b) =>
     a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
