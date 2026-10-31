@@ -22,6 +22,7 @@ export interface RoomConfig {
   roomPrice?: number;
   trashFee?: number;
   peopleCount?: number;
+  note?: string;
 }
 
 export interface RoomData {

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Button, Table } from "@heroui/react";
+import { Button, Table, TextArea } from "@heroui/react";
 import { CircleCheck, CircleCheckFill } from "@gravity-ui/icons";
 import { ShareButton } from "./ShareButton";
 import { EditModal } from "./EditModal";
@@ -99,14 +99,24 @@ export const MeterOutput = ({
             </Table.Header>
             <Table.Body>
               <Table.Row>
-                <Table.Cell><input defaultValue="Số điện" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
+                <Table.Cell>
+                  <input
+                    defaultValue="Số điện"
+                    className="text-2xl field-sizing-content outline-0"
+                  />
+                </Table.Cell>
                 <Table.Cell>{formatNumber(currentElectricity)}</Table.Cell>
                 <Table.Cell>{formatNumber(previousElectricity)}</Table.Cell>
                 <Table.Cell>{formatNumber(electricityUsage)}</Table.Cell>
                 <Table.Cell>{formatVND(electricityCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell><input defaultValue={isWaterByPerson ? "Tiền nước" : "Số nước"} className="text-2xl field-sizing-content outline-0"/></Table.Cell>
+                <Table.Cell>
+                  <input
+                    defaultValue={isWaterByPerson ? "Tiền nước" : "Số nước"}
+                    className="text-2xl field-sizing-content outline-0"
+                  />
+                </Table.Cell>
                 <Table.Cell>
                   {isWaterByPerson ? "-" : formatNumber(currentWater)}
                 </Table.Cell>
@@ -121,14 +131,24 @@ export const MeterOutput = ({
                 <Table.Cell>{formatVND(waterCost)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell><input defaultValue="Tiền rác" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
+                <Table.Cell>
+                  <input
+                    defaultValue="Tiền rác"
+                    className="text-2xl field-sizing-content outline-0"
+                  />
+                </Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell>{formatVND(trashFee)}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.Cell><input defaultValue="Tiền phòng" className="text-2xl field-sizing-content outline-0"/></Table.Cell>
+                <Table.Cell>
+                  <input
+                    defaultValue="Tiền phòng"
+                    className="text-2xl field-sizing-content outline-0"
+                  />
+                </Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
                 <Table.Cell></Table.Cell>
@@ -147,6 +167,13 @@ export const MeterOutput = ({
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
+      <TextArea
+        aria-label="Ghi chú"
+        className="w-full"
+        placeholder="Ghi chú"
+        value={roomConfig?.note ?? ""}
+        onChange={(e) => updateRoomConfig({ note: e.target.value })}
+      />
       <div className="flex flex-wrap items-center justify-center gap-2">
         <Button
           variant={isPaid ? "primary" : "danger-soft"}
