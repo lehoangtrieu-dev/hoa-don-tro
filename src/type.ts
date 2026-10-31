@@ -26,12 +26,13 @@ export interface RoomConfig {
 
 export interface RoomData {
   config?: RoomConfig;
-  months: Record<string, MonthRecord>; // Tháng -> { electricity, water }
+  months: Record<string, MonthRecord>; // Tháng -> { electricity, water, paid }
 }
 
 export interface MonthRecord {
   electricity?: UtilityRecord;
   water?: UtilityRecord;
+  paid?: boolean;
 }
 
 export interface UtilityRecord {

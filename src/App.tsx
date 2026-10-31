@@ -134,6 +134,19 @@ export const App = () => {
     });
   };
 
+  const updateMonthPaid = (paid: boolean) => {
+    setData((prev) => {
+      const next = structuredClone(prev);
+
+      next[house] ??= { rooms: {} };
+      next[house].rooms[room] ??= { months: {} };
+      next[house].rooms[room].months[month] ??= {};
+
+      next[house].rooms[room].months[month].paid = paid;
+      return next;
+    });
+  };
+
   const updateHouseConfig = (
     houseName: string,
     fields: Partial<HouseConfig>,
@@ -258,7 +271,14 @@ export const App = () => {
         />
       </div>
       <UtilityTabs onSelect={setUtility} />
-      <RoomSelector rooms={rooms} room={room} setRoom={setSelectedRoom} />
+      <RoomSelector
+        rooms={rooms}
+        room={room}
+        setRoom={setSelectedRoom}
+        data={data}
+        house={house}
+        month={month}
+      />
       {room ? (
         utility === "bill" ? (
           <MeterOutput
@@ -267,6 +287,7 @@ export const App = () => {
             house={house}
             room={room}
             updateRoomConfig={updateRoomConfig}
+            updateMonthPaid={updateMonthPaid}
           />
         ) : (
           <>

@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { Table } from "@heroui/react";
+import { Button, Table } from "@heroui/react";
+import { CircleCheck, CircleCheckFill } from "@gravity-ui/icons";
 import { ShareButton } from "./ShareButton";
 import { EditModal } from "./EditModal";
 import type { RentalData, RoomConfig } from "../type";
@@ -30,6 +31,7 @@ interface Props {
   house: string;
   room: string;
   updateRoomConfig: (fields: Partial<RoomConfig>) => void;
+  updateMonthPaid: (paid: boolean) => void;
 }
 
 export const MeterOutput = ({
@@ -38,6 +40,7 @@ export const MeterOutput = ({
   house,
   room,
   updateRoomConfig,
+  updateMonthPaid,
 }: Props) => {
   const exportRef = useRef<HTMLDivElement>(null);
   const currentRecord = data[house]?.rooms[room]?.months[month];
@@ -77,6 +80,8 @@ export const MeterOutput = ({
     : waterUsage * waterRate;
 
   const totalCost = electricityCost + waterCost + roomPrice + trashFee;
+
+  const isPaid = !!currentRecord?.paid;
 
   return (
     <>
@@ -144,7 +149,19 @@ export const MeterOutput = ({
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Button
+          variant={isPaid ? "primary" : "danger-soft"}
+          className={
+            isPaid
+              ? "bg-success-soft text-success-soft-foreground hover:bg-success-soft-hover"
+              : ""
+          }
+          onPress={() => updateMonthPaid(!isPaid)}
+        >
+          {isPaid ? <CircleCheckFill /> : <CircleCheck />}
+          <span>{isPaid ? "Đã thanh toán" : "Chưa thanh toán"}</span>
+        </Button>
         <ShareButton room={room} month={month} exportRef={exportRef} />
         <EditModal
           key={`${room}-${roomConfig?.peopleCount ?? ""}`}
