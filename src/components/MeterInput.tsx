@@ -8,7 +8,7 @@ interface Props {
 
 export const MeterInput = ({ value, setValue, unit }: Props) => {
   return (
-    <div className="mt-8">
+    <div className="mt-8 lg:mt-0">
       <Input
         className="field-sizing-content font-black text-4xl"
         value={value !== undefined ? String(value) : ""}

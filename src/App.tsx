@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Alert } from "@heroui/react";
+import { Alert, Button } from "@heroui/react";
+import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
 
 import { SettingsModal } from "./components/settings/SettingsModal";
 import { UtilityTabs } from "./components/UtilityTabs";
 import { PeriodModal } from "./components/PeriodModal";
 import { RoomSelector } from "./components/RoomSelector";
+import { DesktopSidebar } from "./components/DesktopSidebar";
 import { MeterInput } from "./components/MeterInput";
 import { MeterPhoto } from "./components/MeterPhoto";
 import { MeterOutput } from "./components/MeterOutput";
@@ -27,6 +29,12 @@ import type {
 const today = new Date();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
 const yyyy = today.getFullYear();
+
+const getPreviousMonth = (monthStr: string): string => {
+  const [year, m] = monthStr.split("-").map(Number);
+  const prevDate = new Date(year, m - 2, 1);
+  return `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+};
 
 const cleanExpiredMonths = (rawData: RentalData): RentalData => {
   const currentDate = new Date();
@@ -163,6 +171,12 @@ export const App = () => {
   const utilityRecord =
     utility !== "bill"
       ? data[house]?.rooms[room]?.months[month]?.[utility]
+      : undefined;
+
+  const prevMonth = getPreviousMonth(month);
+  const prevUtilityValue =
+    utility !== "bill"
+      ? data[house]?.rooms[room]?.months[prevMonth]?.[utility]?.value
       : undefined;
 
   const updateUtilityRecord = (fields: Partial<UtilityRecord>) => {
@@ -308,8 +322,10 @@ export const App = () => {
     performScan();
   }, [utilityRecord?.image, house, room, month, utility]);
 
+  const currentRoomIndex = rooms.indexOf(room);
+
   return (
-    <div className="w-full lg:max-w-5xl mx-auto flex flex-col items-center p-4 md:py-8 md:px-6 gap-4 md:gap-6 min-h-screen">
+    <div className="min-h-screen w-full lg:flex lg:flex-row">
       <LoadingModal
         isOpen={isScanning || !!scanError}
         error={scanError}
@@ -318,79 +334,170 @@ export const App = () => {
           setScanError(null);
         }}
       />
-      <div className="w-full flex justify-between items-center max-w-xs">
-        <SettingsModal
-          data={data}
-          setData={setData}
-          house={house}
-          houses={houses}
-          updateHouseConfig={updateHouseConfig}
-          user={user}
-          setUser={setUser}
-        />
-        <PeriodModal
-          data={data}
-          houses={houses}
-          house={house}
-          setHouse={setSelectedHouse}
-          month={month}
-          setMonth={setMonth}
-          deleteMonthData={deleteMonthData}
-        />
-      </div>
-      <UtilityTabs onSelect={setUtility} />
-      <RoomSelector
+
+      <DesktopSidebar
+        data={data}
+        houses={houses}
+        house={house}
+        setHouse={setSelectedHouse}
+        month={month}
+        setMonth={setMonth}
+        deleteMonthData={deleteMonthData}
         rooms={rooms}
         room={room}
         setRoom={setSelectedRoom}
-        data={data}
-        house={house}
-        month={month}
       />
-      {room ? (
-        utility === "bill" ? (
-          <MeterOutput
-            month={month}
+
+      <main className="w-full flex-1 flex flex-col items-center p-4 md:py-8 md:px-6 lg:px-10 gap-4 md:gap-6 min-w-0">
+        <div className="w-full flex flex-col items-center gap-4 md:gap-6 lg:max-w-4xl lg:flex-row lg:justify-between">
+          {/* Mobile header (unchanged) */}
+          <div className="w-full flex justify-between items-center max-w-xs lg:hidden">
+            <SettingsModal
+              data={data}
+              setData={setData}
+              house={house}
+              houses={houses}
+              updateHouseConfig={updateHouseConfig}
+              user={user}
+              setUser={setUser}
+            />
+            <PeriodModal
+              data={data}
+              houses={houses}
+              house={house}
+              setHouse={setSelectedHouse}
+              month={month}
+              setMonth={setMonth}
+              deleteMonthData={deleteMonthData}
+            />
+          </div>
+
+          {/* Desktop left: Active room title + prev/next */}
+          <div className="hidden lg:flex items-center gap-1.5 min-w-44">
+            {room && (
+              <>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  isIconOnly
+                  aria-label="Phòng trước"
+                  isDisabled={currentRoomIndex <= 0}
+                  onPress={() => setSelectedRoom(rooms[currentRoomIndex - 1])}
+                >
+                  <ChevronLeft className="size-4" />
+                </Button>
+                <span className="font-bold text-lg px-2 truncate max-w-28">
+                  {room}
+                </span>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  isIconOnly
+                  aria-label="Phòng tiếp theo"
+                  isDisabled={
+                    currentRoomIndex === -1 ||
+                    currentRoomIndex >= rooms.length - 1
+                  }
+                  onPress={() => setSelectedRoom(rooms[currentRoomIndex + 1])}
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </>
+            )}
+          </div>
+
+          <UtilityTabs selectedKey={utility} onSelect={setUtility} />
+
+          {/* Desktop right: Settings */}
+          <div className="hidden lg:flex justify-end min-w-44">
+            <SettingsModal
+              data={data}
+              setData={setData}
+              house={house}
+              houses={houses}
+              updateHouseConfig={updateHouseConfig}
+              user={user}
+              setUser={setUser}
+            />
+          </div>
+        </div>
+
+        {/* Mobile room selector (unchanged) */}
+        <div className="lg:hidden">
+          <RoomSelector
+            rooms={rooms}
+            room={room}
+            setRoom={setSelectedRoom}
             data={data}
             house={house}
-            room={room}
-            updateRoomConfig={updateRoomConfig}
-            updateMonthPaid={updateMonthPaid}
+            month={month}
           />
-        ) : (
-          <>
-            {utility === "water" &&
-              data[house]?.config?.waterBillingType === "person" && (
-                <Alert status="accent" className="w-full max-w-xs">
-                  <Alert.Indicator />
-                  <Alert.Content>
-                    <Alert.Title>
-                      Nhà này tính tiền nước <strong>theo số người</strong>
-                    </Alert.Title>
-                    <Alert.Description>
-                      Bạn có thể chỉnh số người ở trong tab{" "}
-                      <strong>Hóa đơn &gt; Chỉnh sửa</strong>.
-                    </Alert.Description>
-                  </Alert.Content>
-                </Alert>
-              )}
-            <MeterInput
-              value={utilityRecord?.value}
-              setValue={(val) => updateUtilityRecord({ value: val })}
-              unit={utility === "electricity" ? "kWh" : "m³"}
-            />
-            <MeterPhoto
-              image={utilityRecord?.image}
-              setImage={(img) => updateUtilityRecord({ image: img })}
-            />
-          </>
-        )
-      ) : (
-        <div className="text-center py-6 text-muted">
-          <p className="text-sm font-medium">Chưa có phòng trọ nào</p>
-          <p className="text-xs mt-1">Vào cài đặt để thêm phòng trọ đầu tiên</p>
         </div>
-      )}
+
+        {room ? (
+          utility === "bill" ? (
+            <div className="w-full flex flex-col items-center gap-4 md:gap-6 lg:max-w-4xl">
+              <MeterOutput
+                month={month}
+                data={data}
+                house={house}
+                room={room}
+                updateRoomConfig={updateRoomConfig}
+                updateMonthPaid={updateMonthPaid}
+              />
+            </div>
+          ) : (
+            <>
+              {utility === "water" &&
+                data[house]?.config?.waterBillingType === "person" && (
+                  <Alert status="accent" className="w-full max-w-xs lg:max-w-4xl">
+                    <Alert.Indicator />
+                    <Alert.Content>
+                      <Alert.Title>
+                        Nhà này tính tiền nước <strong>theo số người</strong>
+                      </Alert.Title>
+                      <Alert.Description>
+                        Bạn có thể chỉnh số người ở trong tab{" "}
+                        <strong>Hóa đơn &gt; Chỉnh sửa</strong>.
+                      </Alert.Description>
+                    </Alert.Content>
+                  </Alert>
+                )}
+              <div className="w-full flex flex-col items-center gap-4 md:gap-6 lg:max-w-4xl lg:mt-4 lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:rounded-3xl lg:border lg:border-border/60 lg:bg-surface/40 lg:p-10">
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <MeterInput
+                    value={utilityRecord?.value}
+                    setValue={(val) => updateUtilityRecord({ value: val })}
+                    unit={utility === "electricity" ? "kWh" : "m³"}
+                  />
+                  {prevUtilityValue !== undefined && (
+                    <p className="hidden lg:block text-sm text-muted">
+                      Tháng trước:{" "}
+                      <span className="font-semibold text-foreground">
+                        {prevUtilityValue.toLocaleString("vi-VN")}{" "}
+                        {utility === "electricity" ? "kWh" : "m³"}
+                      </span>
+                    </p>
+                  )}
+                </div>
+                <div className="flex justify-center">
+                  <MeterPhoto
+                    image={utilityRecord?.image}
+                    setImage={(img) => updateUtilityRecord({ image: img })}
+                  />
+                </div>
+              </div>
+            </>
+          )
+        ) : (
+          <div className="text-center py-6 text-muted">
+            <p className="text-sm font-medium">Chưa có phòng trọ nào</p>
+            <p className="text-xs mt-1">
+              Vào cài đặt để thêm phòng trọ đầu tiên
+            </p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

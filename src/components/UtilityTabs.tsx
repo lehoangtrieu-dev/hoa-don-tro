@@ -3,13 +3,14 @@ import { Thunderbolt, Droplet, Receipt } from "@gravity-ui/icons";
 import { type UtilityType } from "../type";
 
 interface Props {
+  selectedKey: UtilityType;
   onSelect: React.Dispatch<React.SetStateAction<UtilityType>>;
 }
 
-export const UtilityTabs = ({ onSelect }: Props) => {
+export const UtilityTabs = ({ selectedKey, onSelect }: Props) => {
   return (
     <Tabs
-      defaultSelectedKey="electricity"
+      selectedKey={selectedKey}
       onSelectionChange={(e) => onSelect(e as UtilityType)}
     >
       <Tabs.ListContainer>

@@ -26,6 +26,7 @@ interface Props {
   month: string;
   setMonth: React.Dispatch<React.SetStateAction<string>>;
   deleteMonthData: (houseName: string, targetMonth: string) => void;
+  triggerClassName?: string;
 }
 
 export const PeriodModal = ({
@@ -36,6 +37,7 @@ export const PeriodModal = ({
   setMonth,
   data,
   deleteMonthData,
+  triggerClassName = "rounded-full",
 }: Props) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
@@ -60,14 +62,16 @@ export const PeriodModal = ({
       <Modal isOpen={isPeriodOpen} onOpenChange={setIsPeriodOpen}>
         <Button
           variant="outline"
-          className="rounded-full"
+          className={triggerClassName}
           onPress={() => setIsPeriodOpen(true)}
         >
-          <House className="size-4" />
-          <span>
-            {house || "Chọn nhà"} • {month}
+          <span className="flex items-center gap-2 min-w-0">
+            <House className="size-4 shrink-0" />
+            <span className="truncate">
+              {house || "Chọn nhà"} • {month}
+            </span>
           </span>
-          <ChevronDown className="size-4 text-muted" />
+          <ChevronDown className="size-4 shrink-0 text-muted" />
         </Button>
 
         <Modal.Backdrop>
@@ -129,6 +133,7 @@ export const PeriodModal = ({
                     variant="danger"
                     className="aspect-square"
                     isIconOnly
+                    aria-label="Xóa dữ liệu tháng này"
                     isDisabled={!house || !month}
                     onPress={handleDeleteMonth}
                   >

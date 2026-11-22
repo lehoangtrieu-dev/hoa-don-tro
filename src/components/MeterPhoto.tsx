@@ -80,10 +80,14 @@ export const MeterPhoto = ({ image, setImage }: Props) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative lg:w-full lg:flex lg:justify-center">
       {image ? (
-        <>
-          <img className="rounded-3xl max-w-xs sm:max-w-sm" src={image} alt="Ảnh công tơ" />
+        <div className="relative">
+          <img
+            className="rounded-3xl max-w-xs sm:max-w-sm lg:max-w-md lg:max-h-[55vh] lg:object-contain"
+            src={image}
+            alt="Ảnh công tơ"
+          />
           <Button
             className="absolute top-0 right-0 m-2"
             variant="danger"
@@ -92,16 +96,19 @@ export const MeterPhoto = ({ image, setImage }: Props) => {
           >
             <TrashBin />
           </Button>
-        </>
+        </div>
       ) : (
-        <div>
-          <p className="text-center text-muted mb-4">hoặc</p>
+        <div className="lg:w-full lg:min-h-64 lg:rounded-2xl lg:border lg:border-dashed lg:border-border lg:flex lg:flex-col lg:items-center lg:justify-center lg:gap-2 lg:p-6">
+          <p className="text-center text-muted mb-4 lg:hidden">hoặc</p>
+          <p className="hidden lg:block text-sm text-muted mb-1">
+            Ảnh chụp công tơ
+          </p>
           <Button>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileChange(e)}
-              className="absolute inset-0 opacity-0 size-full"
+              className="absolute inset-0 opacity-0 size-full cursor-pointer"
             />
             <Camera />
             Tải ảnh lên

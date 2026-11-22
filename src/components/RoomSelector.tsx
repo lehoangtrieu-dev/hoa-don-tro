@@ -1,5 +1,6 @@
 import { Pagination, Select, ListBox } from "@heroui/react";
 import type { RentalData } from "../type";
+import { getRoomStatus, type PaymentStatus } from "../utils/roomStatus";
 
 interface Props {
   rooms: string[];
@@ -10,8 +11,6 @@ interface Props {
   month: string;
 }
 
-type PaymentStatus = "paid" | "unfilled" | "unpaid";
-
 export const RoomSelector = ({
   rooms,
   room,
@@ -20,27 +19,6 @@ export const RoomSelector = ({
   house,
   month,
 }: Props) => {
-  const getRoomStatus = (roomName: string): PaymentStatus => {
-    const houseData = data[house];
-    const roomData = houseData?.rooms?.[roomName];
-    const monthRecord = roomData?.months?.[month];
-
-    if (monthRecord?.paid) {
-      return "paid";
-    }
-
-    const isWaterByPerson = houseData?.config?.waterBillingType === "person";
-    const hasElectricity = monthRecord?.electricity?.value !== undefined;
-    const hasWater = isWaterByPerson || monthRecord?.water?.value !== undefined;
-
-    // Both electricity AND water must be filled for it to turn unpaid (red)
-    if (hasElectricity && hasWater) {
-      return "unpaid";
-    }
-
-    return "unfilled";
-  };
-
   const getContainerBgClass = (status: PaymentStatus) => {
     switch (status) {
       case "paid":
@@ -65,7 +43,9 @@ export const RoomSelector = ({
     }
   };
 
-  const currentRoomStatus = room ? getRoomStatus(room) : "unfilled";
+  const currentRoomStatus = room
+    ? getRoomStatus(data, house, room, month)
+    : "unfilled";
 
   return (
     <Pagination className="w-fit">
@@ -96,7 +76,7 @@ export const RoomSelector = ({
             <Select.Popover>
               <ListBox className="max-h-96 overflow-y-auto">
                 {rooms.map((value) => {
-                  const status = getRoomStatus(value);
+                  const status = getRoomStatus(data, house, value, month);
                   const bgClass = getContainerBgClass(status);
                   const textClass = getStatusTextClass(status);
 
