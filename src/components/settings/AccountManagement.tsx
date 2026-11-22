@@ -7,13 +7,19 @@ import {
   Description,
   Select,
   ListBox,
+  Tabs,
 } from "@heroui/react";
-import { Eye, EyeSlash } from "@gravity-ui/icons";
+import { Eye, EyeSlash, Display, Sun, Moon } from "@gravity-ui/icons";
 import { ModelSelector } from "./ModelSelector";
 import Google from "/src/assets/google.svg";
 import { auth, googleProvider } from "./../../services/firebase";
 import { type User, signInWithPopup, signOut } from "firebase/auth";
 import type { RentalData, HouseConfig } from "../../type";
+import {
+  getSavedTheme,
+  setThemePreference,
+  type ThemeMode,
+} from "../../utils/theme";
 
 interface Props {
   user: User | null;
@@ -39,6 +45,7 @@ export const AccountManagement = ({
   house,
   updateHouseConfig,
 }: Props) => {
+  const [theme, setTheme] = useState<ThemeMode>(() => getSavedTheme());
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState(() => {
     const savedApiKey = localStorage.getItem("apiKey");
@@ -105,6 +112,46 @@ export const AccountManagement = ({
         </Button>
       )}
       <div className="flex flex-col gap-4 mt-8">
+        <div>
+          <Label>Giao diện:</Label>
+          <Tabs
+            className="mt-2"
+            selectedKey={theme}
+            onSelectionChange={(key) => {
+              if (!key) return;
+              const nextTheme = String(key) as ThemeMode;
+              setTheme(nextTheme);
+              setThemePreference(nextTheme);
+            }}
+          >
+            <Tabs.ListContainer>
+              <Tabs.List>
+                <Tabs.Tab id="auto">
+                  <span className="flex items-center whitespace-nowrap gap-1.5">
+                    <Display className="size-4" />
+                    Tự động
+                    <Tabs.Indicator />
+                  </span>
+                </Tabs.Tab>
+                <Tabs.Tab id="light">
+                  <span className="flex items-center gap-1.5">
+                    <Sun className="size-4" />
+                    Sáng
+                    <Tabs.Indicator />
+                  </span>
+                </Tabs.Tab>
+                <Tabs.Tab id="dark">
+                  <span className="flex items-center gap-1.5">
+                    <Moon className="size-4" />
+                    Tối
+                    <Tabs.Indicator />
+                  </span>
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs.ListContainer>
+          </Tabs>
+        </div>
+
         {house && (
           <div>
             <Select
@@ -117,7 +164,7 @@ export const AccountManagement = ({
                 });
               }}
             >
-              <Label>Tự xóa hóa đơn cũ <span className="text-muted">– {house}</span>:</Label>
+              <Label>Tự động xóa hóa đơn cũ của "{house}":</Label>
               <Select.Trigger>
                 <Select.Value />
                 <Select.Indicator />

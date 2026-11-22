@@ -40,9 +40,10 @@ export const ShareButton = ({ room, month, exportRef }: Props) => {
     if (!element) return;
 
     try {
+      const isDark = document.documentElement.classList.contains("dark");
       const imageBlob = await domToBlob(element, {
         scale: 2,
-        backgroundColor: "#fff",
+        backgroundColor: isDark ? "#18181b" : "#fff",
 
         width: element.scrollWidth,
         height: element.scrollHeight,

@@ -53,7 +53,7 @@ export function SettingsModal({
                 >
                   <Tabs.ListContainer>
                     <Tabs.List>
-                      <Tabs.Tab id="1">
+                      <Tabs.Tab className="whitespace-nowrap" id="1">
                         Nhà & Phòng
                         <Tabs.Indicator />
                       </Tabs.Tab>

@@ -17,6 +17,7 @@ import {
   saveToFirestore,
   subscribeToFirestore,
 } from "./services/firebase";
+import { subscribeToSystemTheme } from "./utils/theme";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import type {
   RentalData,
@@ -87,6 +88,10 @@ export const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isCloudSynced, setIsCloudSynced] = useState(false);
   const isRemoteUpdateRef = useRef(false);
+
+  useEffect(() => {
+    return subscribeToSystemTheme();
+  }, []);
 
   useEffect(() => {
     let unsubscribeFirestore: (() => void) | null = null;
