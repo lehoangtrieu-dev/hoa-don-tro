@@ -13,10 +13,14 @@ import { ModelSelector } from "./ModelSelector";
 import Google from "/src/assets/google.svg";
 import { auth, googleProvider } from "./../../services/firebase";
 import { type User, signInWithPopup, signOut } from "firebase/auth";
+import type { RentalData, HouseConfig } from "../../type";
 
 interface Props {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  data: RentalData;
+  house: string;
+  updateHouseConfig: (houseName: string, fields: Partial<HouseConfig>) => void;
 }
 
 const AUTO_DELETE_OPTIONS = [
@@ -28,24 +32,26 @@ const AUTO_DELETE_OPTIONS = [
   { value: "12", label: "Cũ hơn 12 tháng" },
 ];
 
-export const AccountManagement = ({ user, setUser }: Props) => {
+export const AccountManagement = ({
+  user,
+  setUser,
+  data,
+  house,
+  updateHouseConfig,
+}: Props) => {
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState(() => {
     const savedApiKey = localStorage.getItem("apiKey");
     return savedApiKey ? savedApiKey : "";
   });
 
-  const [autoDeleteMonths, setAutoDeleteMonths] = useState(() => {
-    return localStorage.getItem("autoDeleteMonths") || "never";
-  });
+  const autoDeleteMonths = String(
+    data[house]?.config?.autoDeleteMonths ?? "never",
+  );
 
   useEffect(() => {
     localStorage.setItem("apiKey", apiKey);
   }, [apiKey]);
-
-  useEffect(() => {
-    localStorage.setItem("autoDeleteMonths", autoDeleteMonths);
-  }, [autoDeleteMonths]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -99,34 +105,40 @@ export const AccountManagement = ({ user, setUser }: Props) => {
         </Button>
       )}
       <div className="flex flex-col gap-4 mt-8">
-        <div>
-          <Select
-            value={autoDeleteMonths}
-            onChange={(key) => {
-              if (key) setAutoDeleteMonths(String(key));
-            }}
-          >
-            <Label>Tự động xóa hóa đơn cũ:</Label>
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                {AUTO_DELETE_OPTIONS.map((opt) => (
-                  <ListBox.Item
-                    id={opt.value}
-                    key={opt.value}
-                    textValue={opt.label}
-                  >
-                    {opt.label}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </Select.Popover>
-          </Select>
-        </div>
+        {house && (
+          <div>
+            <Select
+              value={autoDeleteMonths}
+              onChange={(key) => {
+                if (!key) return;
+                const val = String(key);
+                updateHouseConfig(house, {
+                  autoDeleteMonths: val === "never" ? "never" : Number(val),
+                });
+              }}
+            >
+              <Label>Tự xóa hóa đơn cũ <span className="text-muted">– {house}</span>:</Label>
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {AUTO_DELETE_OPTIONS.map((opt) => (
+                    <ListBox.Item
+                      id={opt.value}
+                      key={opt.value}
+                      textValue={opt.label}
+                    >
+                      {opt.label}
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
+          </div>
+        )}
 
         <div>
           <Label>Gemini API Key:</Label>

@@ -13,6 +13,7 @@ import {
   Calendar,
   ChevronDown,
   LayoutHeaderCellsLarge,
+  TrashBin,
 } from "@gravity-ui/icons";
 import { ReportModal } from "./ReportModal";
 import type { RentalData } from "../type";
@@ -24,6 +25,7 @@ interface Props {
   setHouse: React.Dispatch<React.SetStateAction<string>>;
   month: string;
   setMonth: React.Dispatch<React.SetStateAction<string>>;
+  deleteMonthData: (houseName: string, targetMonth: string) => void;
 }
 
 export const PeriodModal = ({
@@ -33,9 +35,25 @@ export const PeriodModal = ({
   month,
   setMonth,
   data,
+  deleteMonthData,
 }: Props) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
+
+  const handleDeleteMonth = () => {
+    if (!house || !month) return;
+    if (
+      confirm(
+        `Bạn có chắc muốn xóa toàn bộ dữ liệu tháng ${month} của "${house}" không?`,
+      )
+    ) {
+      deleteMonthData(house, month);
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      setMonth(currentMonth);
+      setIsPeriodOpen(false);
+    }
+  };
 
   return (
     <>
@@ -92,20 +110,31 @@ export const PeriodModal = ({
                     </ListBox>
                   </Select.Popover>
                 </Select>
-                <TextField
-                  className="w-full mt-4"
-                  type="month"
-                  variant="secondary"
-                >
-                  <Label className="flex items-center gap-1.5">
-                    <Calendar className="size-4" />
-                    Tháng ghi số
-                  </Label>
-                  <Input
-                    value={month}
-                    onChange={(e) => setMonth(e.currentTarget.value)}
-                  />
-                </TextField>
+                <div className="flex items-end gap-1.5 mt-4">
+                  <TextField
+                    className="w-full"
+                    type="month"
+                    variant="secondary"
+                  >
+                    <Label className="flex items-center gap-1.5">
+                      <Calendar className="size-4" />
+                      Tháng ghi số
+                    </Label>
+                    <Input
+                      value={month}
+                      onChange={(e) => setMonth(e.currentTarget.value)}
+                    />
+                  </TextField>
+                  <Button
+                    variant="danger"
+                    className="aspect-square"
+                    isIconOnly
+                    isDisabled={!house || !month}
+                    onPress={handleDeleteMonth}
+                  >
+                    <TrashBin />
+                  </Button>
+                </div>
               </Modal.Body>
               <Modal.Footer>
                 <Button

@@ -63,7 +63,13 @@ export function SettingsModal({
                   />
                 </Tabs.Panel>
                 <Tabs.Panel id="2">
-                  <AccountManagement user={user} setUser={setUser} />
+                  <AccountManagement
+                    user={user}
+                    setUser={setUser}
+                    data={data}
+                    house={house}
+                    updateHouseConfig={updateHouseConfig}
+                  />
                 </Tabs.Panel>
               </Tabs>
             </Modal.Body>

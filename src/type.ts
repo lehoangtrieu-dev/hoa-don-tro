@@ -16,6 +16,7 @@ export interface HouseConfig {
   electricityRate?: number;
   waterRate?: number;
   waterBillingType?: WaterBillingType;
+  autoDeleteMonths?: number | "never";
 }
 
 export interface RoomConfig {

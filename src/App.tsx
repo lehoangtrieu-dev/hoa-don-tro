@@ -29,12 +29,6 @@ const mm = String(today.getMonth() + 1).padStart(2, "0");
 const yyyy = today.getFullYear();
 
 const cleanExpiredMonths = (rawData: RentalData): RentalData => {
-  const autoDeleteSetting = localStorage.getItem("autoDeleteMonths") || "never";
-  if (autoDeleteSetting === "never") return rawData;
-
-  const thresholdMonths = Number(autoDeleteSetting);
-  if (isNaN(thresholdMonths) || thresholdMonths <= 0) return rawData;
-
   const currentDate = new Date();
   const currentMonthIndex =
     currentDate.getFullYear() * 12 + currentDate.getMonth();
@@ -44,6 +38,12 @@ const cleanExpiredMonths = (rawData: RentalData): RentalData => {
 
   for (const houseKey of Object.keys(nextData)) {
     const houseObj = nextData[houseKey];
+    const autoDeleteSetting = houseObj?.config?.autoDeleteMonths;
+    if (!autoDeleteSetting || autoDeleteSetting === "never") continue;
+
+    const thresholdMonths = Number(autoDeleteSetting);
+    if (isNaN(thresholdMonths) || thresholdMonths <= 0) continue;
+
     if (!houseObj?.rooms) continue;
 
     for (const roomKey of Object.keys(houseObj.rooms)) {
@@ -77,6 +77,7 @@ export const App = () => {
   });
 
   const [user, setUser] = useState<User | null>(null);
+  const [isCloudSynced, setIsCloudSynced] = useState(false);
   const isRemoteUpdateRef = useRef(false);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export const App = () => {
 
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setIsCloudSynced(false);
 
       if (unsubscribeFirestore) {
         unsubscribeFirestore();
@@ -95,9 +97,11 @@ export const App = () => {
           currentUser.uid,
           (cloudData) => {
             if (cloudData && Object.keys(cloudData).length > 0) {
-              isRemoteUpdateRef.current = true;
-              setData(cleanExpiredMonths(cloudData));
+              const cleanedData = cleanExpiredMonths(cloudData);
+              isRemoteUpdateRef.current = cleanedData === cloudData;
+              setData(cleanedData);
             }
+            setIsCloudSynced(true);
           },
         );
       }
@@ -217,6 +221,27 @@ export const App = () => {
     });
   };
 
+  const deleteMonthData = (houseName: string, targetMonth: string) => {
+    if (!houseName || !targetMonth) return;
+    setData((prev) => {
+      const houseObj = prev[houseName];
+      if (!houseObj?.rooms) return prev;
+
+      let hasChanged = false;
+      const next = structuredClone(prev);
+
+      for (const roomKey of Object.keys(next[houseName].rooms)) {
+        const roomObj = next[houseName].rooms[roomKey];
+        if (roomObj?.months && targetMonth in roomObj.months) {
+          delete roomObj.months[targetMonth];
+          hasChanged = true;
+        }
+      }
+
+      return hasChanged ? next : prev;
+    });
+  };
+
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
 
@@ -225,7 +250,7 @@ export const App = () => {
       return;
     }
 
-    if (!user) return;
+    if (!user || !isCloudSynced) return;
 
     const timer = setTimeout(async () => {
       try {
@@ -236,7 +261,7 @@ export const App = () => {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [data, user]);
+  }, [data, user, isCloudSynced]);
 
   useEffect(() => {
     const currentKey = `${house}-${room}-${month}-${utility}`;
@@ -310,6 +335,7 @@ export const App = () => {
           setHouse={setSelectedHouse}
           month={month}
           setMonth={setMonth}
+          deleteMonthData={deleteMonthData}
         />
       </div>
       <UtilityTabs onSelect={setUtility} />

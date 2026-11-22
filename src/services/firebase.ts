@@ -32,7 +32,7 @@ export const saveToFirestore = async <T extends DocumentData>(
   if (!uid) throw new Error("A valid User UID is required.");
   const userDocRef = doc(db, "users", uid);
   const sanitizedData = JSON.parse(JSON.stringify(data));
-  await setDoc(userDocRef, sanitizedData, { merge: true });
+  await setDoc(userDocRef, sanitizedData);
 };
 
 export const loadFromFirestore = async (uid: string) => {
@@ -46,15 +46,13 @@ export const loadFromFirestore = async (uid: string) => {
 
 export const subscribeToFirestore = (
   uid: string,
-  onData: (data: RentalData) => void,
+  onData: (data: RentalData | null) => void,
 ) => {
   const userDocRef = doc(db, "users", uid);
   return onSnapshot(
     userDocRef,
     (snap) => {
-      if (snap.exists()) {
-        onData(snap.data() as RentalData);
-      }
+      onData(snap.exists() ? (snap.data() as RentalData) : null);
     },
     (err) => {
       console.error("Firestore onSnapshot error:", err);
